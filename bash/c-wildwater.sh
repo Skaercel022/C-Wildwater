@@ -16,7 +16,7 @@ cmd="$1"
 #verif commandes histo
 if [ "$cmd" -eq "histo" ]; then
     if [ $# -ne 2 ]; then
-        echo "Erreur : usage -> $0 histo {max|src|real}"
+        echo "Erreur : usage -> $0 histo max|src|real"
         exit 1
     fi
 
