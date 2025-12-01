@@ -14,7 +14,7 @@ fi
 cmd="$1"
 
 #verif commandes histo
-if [ "$cmd" -eq "histo" ]; then
+if [ "$cmd" = "histo" ]; then
     if [ $# -ne 2 ]; then
         echo "Erreur : usage -> $0 histo max|src|real"
         exit 1
@@ -22,14 +22,14 @@ if [ "$cmd" -eq "histo" ]; then
 
     mode="$2"
 
-    if [ "$mode" -ne "max" ] && [ "$mode" -ne "src" ] && [ "$mode" -ne "real" ]; then
+    if [ "$mode" != "max" ] && [ "$mode" != "src" ] && [ "$mode" != "real" ]; then
         echo "Erreur : mode histo invalide : $mode"
         echo "Modes valides : max | src | real"
         exit 1
     fi
 
 #verif commandes leaks
-elif [ "$cmd" -eq "leaks" ]; then
+elif [ "$cmd" = "leaks" ]; then
 
     if [ $# -ne 2 ]; then
         echo "Erreur : usage -> $0 leaks "ID_USINE""
