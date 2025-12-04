@@ -70,7 +70,7 @@ AVL* doubleRotationDroite(AVL* pAVL) {
 }
 
 AVL* doubleRotationGache(AVL* pAVL) {
-    pAVL->pDroit = rightRotation(pAVL->pDroit);
+    pAVL->pDroit = rotationDroite(pAVL->pDroit);
     return rotationGauche(pAVL);
 }
 
