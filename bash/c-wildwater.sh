@@ -45,11 +45,17 @@ else
     exit 1
 fi
 
-cd codeC
+#compilation et verif compilation
+
+run="run"
+
+cd "$(dirname "$0")/../codeC"
+
 make
 
-if [ -e "$run" ]; then
-    ./run
+if [ -f "$run" ]; then
+    ./"$run"
+    make clean
 else
     echo "Erreur make"
     exit 2
