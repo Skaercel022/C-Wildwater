@@ -1,4 +1,4 @@
-#include "include.h"
+#include "./include/include.h"
 
 int max(int a, int b) {
     if (a >= b) {
@@ -13,3 +13,4 @@ int min(int a, int b) {
     }
     return b;
 }
+
