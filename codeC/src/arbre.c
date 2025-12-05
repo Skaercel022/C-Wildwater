@@ -41,7 +41,7 @@ void suppListeArbre(Liste_arbre* liste){
         tmp = liste;
         liste = liste->pSuivant;
 
-        free(tmp->id);   // libère la chaîne copiée
+        free(tmp->id);
         free(tmp);
     }
 }
@@ -64,3 +64,4 @@ void suppNoeud(Arbre* arbre){
         free(arbre);
     }
 }
+
