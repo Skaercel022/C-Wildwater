@@ -5,5 +5,5 @@ if [ "$mode" = "max" ]; then
     return valmax.csv  # Retourne un code de sortie
 fi
     
-if ["$mode" = "src"]; then
+if [ "$mode" = "src" ]; then
 	echo "Usine,prelevement">> vol_capation.txt"
