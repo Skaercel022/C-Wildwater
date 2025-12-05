@@ -1,11 +1,12 @@
 #include "../include/include.h"
 
-AVL* creerAVL(char *charactere) {
+AVL* creerAVL(char* carac) {
     AVL* pAVL = malloc(sizeof(AVL));
     if (pAVL == NULL) {
         exit(1);
     }
-    pAVL->val = character;
+    pAVL->val = malloc(sizeof(strlen(carac)+1));
+    pAVL->val = carac;
     pAVL->pGauche = NULL;
     pAVL->pDroit = NULL;
     pAVL->equilibre = 0;
@@ -97,7 +98,7 @@ AVL* equilibrerAVL(AVL* pAVL) {
 AVL* insertionAVL(AVL* pAVL, char* id, int* h) {
     if (pAVL == NULL) {
         *h = 1;
-        return creerAVL(e);
+        return creerAVL(id);
     }
     else if (strcmp(id, pAVL->val) < 0) {
         pAVL->pGauche = insertionAVL(pAVL->pGauche, id, h);
@@ -159,14 +160,14 @@ AVL* suppressionAVL(AVL* pAVL, char* id, int* h) {
     }
     // Recherche de l'élément à supprimer
     else if (strcmp(pAVL->val, id) < 0) {
-        pAVL->pDroit = suppressionAVL(pAVL->pDroit, e, h);
+        pAVL->pDroit = suppressionAVL(pAVL->pDroit, id, h);
     }
     else if (strcmp(pAVL->val, id) > 0) {
-        pAVL->pGauche = suppressionAVL(pAVL->pGauche, e, h);
+        pAVL->pGauche = suppressionAVL(pAVL->pGauche, id, h);
         *h = - *h;
     }
     else if (existDroit(pAVL)) {
-        pAVL->pDroit = suppMinAVL(pAVL->pDroit, h, &e);
+        pAVL->pDroit = suppMinAVL(pAVL->pDroit, h, &id);
     }
     else {
         tmp = pAVL;
