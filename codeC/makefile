@@ -10,26 +10,26 @@ OBJ_DIR = obj
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-# Exécutable
+#executable
 TARGET = run
 
-# Règle principale
 all: $(TARGET)
 
-# Construction de l'exécutable
+#construction de l'exécutable
 $(TARGET): $(OBJS)
 	$(CC) -o $@ $^
 
-# Compilation des .c en .o
+#compilation des .c en .o
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-# Création du dossier obj si nécessaire
+#création du dossier obj si nécessaire
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 
-# Nettoyage
+#nettoyage
 clean:
 	rm -rf $(OBJ_DIR) $(TARGET)
 
+#pour eviter les bugs si un fichier clean ou all existe
 .PHONY: all clean
