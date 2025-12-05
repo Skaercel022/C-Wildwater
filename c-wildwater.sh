@@ -49,7 +49,7 @@ fi
 
 run="run"
 
-cd "$(dirname "$0")/../codeC"
+cd "$(dirname "$0")/codeC"
 
 make
 
