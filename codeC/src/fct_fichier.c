@@ -1,5 +1,5 @@
 //objectif de cette partie : ouvrir fichier avec les sources et les usines
-//lire les données et modifier les l'avl usine
+//lire les données et modifier les l'avl_usine usine
 
 #include "../include/include.h"
 
