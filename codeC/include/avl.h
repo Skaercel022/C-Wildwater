@@ -1,5 +1,5 @@
 typedef struct avl {
-    int val;
+    char* val;
     struct avl* pDroit;
     struct avl* pGauche;
     int equilibre;
@@ -10,9 +10,9 @@ AVL* rotationGauche(AVL* pAVL);
 AVL* doubleRotationDroite(AVL* pAVL);
 AVL* doubleRotationGache(AVL* pAVL);
 AVL* equilibrerAVL(AVL* pAVL);
-AVL* creerAVL(int value);
+AVL* creerAVL(char* charactere);
 int existeGauche(AVL* pAVL);
 int existDroit(AVL* pAVL);
-AVL* insertionAVL(AVL* pAVL, int e, int* h);
-AVL* suppMinAVL(AVL* pAVL, int* pe, int *h);
-AVL* suppressionAVL(AVL* pAVL, int e, int* h);
+AVL* insertionAVL(AVL* pAVL, char* id, int* h);
+AVL* suppMinAVL(AVL* pAVL, char* pe, int *h);
+AVL* suppressionAVL(AVL* pAVL, char* id, int* h);
