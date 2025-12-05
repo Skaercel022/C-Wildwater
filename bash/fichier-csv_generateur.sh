@@ -1,4 +1,4 @@
-if [ "$mode" = "max" ]; then
+"if [ "$mode" = "max" ]; then
     echo "Usine,traitementmax">>vol_max.dat
     val=$( grep -E '^-;[^-;]+;-;' c-wildwater_v0.dat | cut -d ';' -f2,4)
     echo "$val" >>valmax.csv	
@@ -22,3 +22,4 @@ case "$mode" in
     	src)
     		echo 
 grep -E '^-;[^-;]+;' c-wildwater_v0.dat | cut -d ';' -f2,4,5
+
