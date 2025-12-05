@@ -1,24 +1,18 @@
 #include "../include/include.h"
 
-Arbre* creerArbre(double volume, float fuite){
-    Arbre* arbre = malloc(sizeof(Arbre));
-    if(arbre == NULL){
-        exit(1);
-    }
-
-    arbre->V_amont = volume;
-    arbre->fuite_amont = fuite;
-    arbre->enfant = NULL;
-    return arbre;
-}
-
 Liste_arbre* creerListeArbre(char* id){
     Liste_arbre* liste = malloc(sizeof(Liste_arbre));
     if(liste == NULL){
         exit(1);
     }
 
-    liste->id = id;
+    liste->id = malloc(strlen(id) + 1);
+    if(liste->id == NULL){
+        free(liste);
+        exit(1);
+    }
+    strcpy(liste->id, id);
+
     liste->pSuivant = NULL;
     return liste;
 }
@@ -40,20 +34,33 @@ void ajouterEnfant(Arbre* arbre, char* id_enfant){
     }
 }
 
-void libererListeArbre(Liste_arbre* liste){
-    Liste_arbre* p1 = liste;
-    Liste_arbre* next;
+void suppListeArbre(Liste_arbre* liste){
+    Liste_arbre* tmp;
 
-    while(p1 != NULL){
-        next = p1->pSuivant;
-        free(p1);
-        p1 = next;
+    while(liste != NULL){
+        tmp = liste;
+        liste = liste->pSuivant;
+
+        free(tmp->id);   // libère la chaîne copiée
+        free(tmp);
     }
 }
 
-void libererArbre(Arbre* arbre){
+Arbre* creerArbre(double volume, float fuite){
+    Arbre* arbre = malloc(sizeof(Arbre));
+    if(arbre == NULL){
+        exit(1);
+    }
+
+    arbre->V_amont = volume;
+    arbre->fuite_amont = fuite;
+    arbre->enfant = NULL;
+    return arbre;
+}
+
+void suppNoeud(Arbre* arbre){
     if(arbre != NULL){
-        libererListeArbre(arbre->enfant);
+        suppListeArbre(arbre->enfant);
         free(arbre);
     }
 }
