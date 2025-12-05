@@ -8,9 +8,8 @@ typedef struct avl_usine {
     struct avl_usine* pGauche;
     int equilibre;
     int max;
-    int 
-
-
+    int capte;
+    int traite;
 }AVL_USINE;
 
 
@@ -27,5 +26,6 @@ AVL_USINE* insertionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h);
 AVL_USINE* suppMinAVL_USINE(AVL_USINE* pAVL_USINE, char* pe, int *h);
 AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h);
 Arbre* rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id);
+AVL_USINE* rechercherAdresse(AVL_USINE* p, char *id);
 
 #endif // AVL_USINE_H

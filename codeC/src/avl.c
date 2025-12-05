@@ -5,11 +5,15 @@ AVL_USINE* creerAVL_USINE(char* carac) {
     if (pAVL_USINE == NULL) {
         exit(1);
     }
-    pAVL_USINE->val = malloc(sizeof(strlen(carac)+1));
-    pAVL_USINE->val = carac;
+    pAVL_USINE->val = malloc(strlen(carac) + 1);
+    strcpy(pAVL_USINE->val, carac);
+
     pAVL_USINE->pGauche = NULL;
     pAVL_USINE->pDroit = NULL;
     pAVL_USINE->equilibre = 0;
+    pAVL_USINE->max = 0;
+    pAVL_USINE->capte = 0;
+    pAVL_USINE->traite = 0;
     return pAVL_USINE;
 }
 
@@ -190,17 +194,26 @@ AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h) {
     return pAVL_USINE;
 }
 
-Arbre* rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id) {
+int rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id) {
     if (pAVL_USINE == NULL) {
-        return NULL;
+        return 0;
+    }
+    else if (strcmp(id, pAVL_USINE->val) == 0){
+        return 1;
     }
     else if (strcmp(id, pAVL_USINE->val) < 0) {
         return rechercheAVL_USINE(pAVL_USINE->pGauche, id);
     }
-    else if (strcmp(id, pAVL_USINE->val) > 0) {
+    else {
         return rechercheAVL_USINE(pAVL_USINE->pDroit, id);
     }
-    else {
-        return pAVL_USINE->arbre;
-    }
+}
+
+AVL_USINE* rechercherAdresse(AVL_USINE* p, char *id) {
+    if (!p) return NULL;
+
+    int cmp = strcmp(id, p->val);
+    if (cmp == 0) return p;
+    else if (cmp < 0) return rechercherAdresse(p->pGauche, id);
+    else return rechercherAdresse(p->pDroit, id);
 }
