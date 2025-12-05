@@ -92,9 +92,9 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
             continue;
         }
 
-        //ligne "source->usine"
+        //ligne "source->usine" -> on traite
         if (estVide(col1) && !estVide(col2) && !estVide(col3) && !estVide(col4) && !estVide(col5)) {
-            char *id_usine = col3;
+            char* id_usine = col3;
             int vol_capte = atoi(col4);
             float fuite = atof(col5);
 
