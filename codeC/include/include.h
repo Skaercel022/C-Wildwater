@@ -5,3 +5,4 @@
 
 #include "avl.h"
 #include "fonction.h"
+#include "arbre.h"
