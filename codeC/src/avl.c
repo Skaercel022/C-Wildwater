@@ -190,3 +190,17 @@ AVL* suppressionAVL(AVL* pAVL, char* id, int* h) {
     return pAVL;
 }
 
+Arbre* rechercheAVL(AVL* pAVL, char* id) {
+    if (pAVL == NULL) {
+        return NULL;
+    }
+    else if (strcmp(id, pAVL->val) < 0) {
+        return rechercheAVL(pAVL->pGauche, id);
+    }
+    else if (strcmp(id, pAVL->val) > 0) {
+        return rechercheAVL(pAVL->pDroit, id);
+    }
+    else {
+        return pAVL->arbre;
+    }
+}

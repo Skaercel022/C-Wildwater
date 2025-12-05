@@ -1,3 +1,6 @@
+#ifndef ARBRE_H
+#define ARBRE_H
+
 //liste chainée
 typedef struct liste_arbre{
     char* id;
@@ -10,3 +13,4 @@ typedef struct {
     float fuite_amont;
     Liste_arbre* enfant;
 }Arbre;
+#endif // ARBRE_H
