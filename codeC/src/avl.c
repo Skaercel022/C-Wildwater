@@ -1,11 +1,11 @@
 #include "../include/include.h"
 
-AVL* creerAVL(int value) {
+AVL* creerAVL(char *charactere) {
     AVL* pAVL = malloc(sizeof(AVL));
     if (pAVL == NULL) {
         exit(1);
     }
-    pAVL->val = value;
+    pAVL->val = character;
     pAVL->pGauche = NULL;
     pAVL->pDroit = NULL;
     pAVL->equilibre = 0;
@@ -94,17 +94,17 @@ AVL* equilibrerAVL(AVL* pAVL) {
     return pAVL;
 }
 
-AVL* insertionAVL(AVL* pAVL, int e, int* h) {
+AVL* insertionAVL(AVL* pAVL, char* id, int* h) {
     if (pAVL == NULL) {
         *h = 1;
         return creerAVL(e);
     }
-    else if (pAVL->val > e) {
-        pAVL->pGauche = insertionAVL(pAVL->pGauche, e, h);
+    else if (strcmp(id, pAVL->val) < 0) {
+        pAVL->pGauche = insertionAVL(pAVL->pGauche, id, h);
         *h = - *h;
     }
-    else if (pAVL->val < e) {
-        pAVL->pDroit = insertionAVL(pAVL->pDroit, e, h);
+    else if (strcmp(id, pAVL->val) > 0) {
+        pAVL->pDroit = insertionAVL(pAVL->pDroit, id, h);
     }
     else {
         *h = 0;
@@ -124,7 +124,7 @@ AVL* insertionAVL(AVL* pAVL, int e, int* h) {
     return pAVL;
 }
 
-AVL* suppMinAVL(AVL* pAVL, int* pe, int *h) {
+AVL* suppMinAVL(AVL* pAVL, char* pe, int *h) {
     AVL* tmp = NULL;
     if (pAVL->pGauche == NULL) {
         *pe = pAVL->val;
@@ -151,16 +151,17 @@ AVL* suppMinAVL(AVL* pAVL, int* pe, int *h) {
     return pAVL;
 }
 
-AVL* suppressionAVL(AVL* pAVL, int e, int* h) {
+AVL* suppressionAVL(AVL* pAVL, char* id, int* h) {
     AVL* tmp = NULL;
     if (pAVL == NULL) {
         *h = 0;
         return pAVL;
     }
-    else if (pAVL->val < e) {
+    // Recherche de l'élément à supprimer
+    else if (strcmp(pAVL->val, id) < 0) {
         pAVL->pDroit = suppressionAVL(pAVL->pDroit, e, h);
     }
-    else if (pAVL->val > e) {
+    else if (strcmp(pAVL->val, id) > 0) {
         pAVL->pGauche = suppressionAVL(pAVL->pGauche, e, h);
         *h = - *h;
     }
@@ -174,7 +175,7 @@ AVL* suppressionAVL(AVL* pAVL, int e, int* h) {
         *h = -1;
         return pAVL;
     }
-
+    // Equilibrage
     if (*h != 0) {
         pAVL->equilibre += *h;
         pAVL = equilibrerAVL(pAVL);
