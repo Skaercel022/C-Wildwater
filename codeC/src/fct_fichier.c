@@ -3,10 +3,6 @@
 
 #include "../include/include.h"
 
-int estVide(const char *s) {
-    return (strcmp(s, "-") == 0);
-}
-
 //fonction d'ouverture de fichier
 FILE* ouvrirFichier(char* nom_fichier){
     FILE* fichier = fopen(nom_fichier, "r");
@@ -23,6 +19,9 @@ void fermerFichier(FILE* fichier){
     }
 }
 
+int estVide(const char *s) {
+    return (strcmp(s, "-") == 0);
+}
 
 //fonction utilitaire permettant de lire une ligne complète d'un fichier peu importe sa longueur
 
@@ -62,11 +61,12 @@ char* lireLigne(FILE* fichier) {
 }
 
 //fonction de lecture du fichier et insertion dans l'avl_usine
+//A MODIFIER :
+// - MODIFIER VALEUR SI DEJA PRESENT
+// - VERIFIER TOUS LES MALLOC
 
 void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
-
     char* ligne;
-
     while ((ligne = lireLigne(fichier)) != NULL) {
 
         if (ligne[0] == '\0') {
@@ -85,24 +85,83 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
             free(ligne);
             exit(60);
         }
-
-        //ligne "usine" -> on passe à la suivante
+        
+        //-----------------------------------
+        //ligne "usine" on ajouter volume max
+        //-----------------------------------
         if (estVide(col1) && estVide(col3) && !estVide(col4) && estVide(col5)) {
-            free(ligne);
-            continue;
-        }
+            char* id_usine_entier = col2;
+            int vol_max = atoi(col4);
 
-        //ligne "source->usine" -> on traite
-        if (estVide(col1) && !estVide(col2) && !estVide(col3) && !estVide(col4) && !estVide(col5)) {
-            char* id_usine = col3;
-            int vol_capte = atoi(col4);
-            float fuite = atof(col5);
+            //cherche le caractère # pour enlever le nom de l'usine
+            char* ptr = strchr(id_usine_entier, '#');
+            char* id_usine = NULL;
+
+            if (ptr != NULL) {
+                //avance d'un caractère pour sauter le #
+                id_usine = ptr + 1;
+            }
+            else {
+                free(ligne);
+                exit(61);
+            }
 
             if (!rechercheAVL_USINE(*racine, id_usine)) {
 
                 int h = 0;
 
-                char *copie = malloc(strlen(id_usine) + 1);
+                char* copie = malloc(strlen(id_usine) + 1);
+                if (copie == NULL) {
+                    free(ligne);
+                    exit(52);
+                }
+                strcpy(copie, id_usine);
+
+                *racine = insertionAVL_USINE(*racine, copie, &h);
+
+                AVL_USINE* usine = rechercherAdresse(*racine, copie);
+                if (usine != NULL) {
+                    usine->max = vol_max;
+                }
+            }
+            //usine déja creee
+            else{
+                AVL_USINE* usine = rechercheAdresse(*racine, id_usine);
+                if (usine != NULL) {
+                    usine->max = vol_max;
+                }
+            }
+        }
+        //------------------------------------------------------
+        //ligne "source->usine" on ajouter volume capte et fuite
+        //------------------------------------------------------
+        else if (estVide(col1) && !estVide(col2) && !estVide(col3) && !estVide(col4) && !estVide(col5)) {
+            char* id_usine_entier = col3;
+            int vol_capte = atoi(col4);
+            float fuite = atof(col5);
+
+            //cherche le caractère # pour enlever le nom de l'usine
+            char* ptr = strchr(id_usine_entier, '#');
+            char* id_usine = NULL;
+
+            if (ptr != NULL) {
+                //avance d'un caractère pour sauter le #
+                id_usine = ptr + 1;
+            }
+            else {
+                free(ligne);
+                exit(61);
+            }
+
+            if (!rechercheAVL_USINE(*racine, id_usine)) {
+
+                int h = 0;
+
+                char* copie = malloc(strlen(id_usine) + 1);
+                if (copie == NULL) {
+                    free(ligne);
+                    exit(52);
+                }
                 strcpy(copie, id_usine);
 
                 *racine = insertionAVL_USINE(*racine, copie, &h);
@@ -113,6 +172,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                     usine->traite = vol_capte * (1.0f - fuite / 100.0f);
                 }
             }
+            //usine déja creee
             else {
                 //modifier valeur
             }
