@@ -61,12 +61,10 @@ char* lireLigne(FILE* fichier) {
 }
 
 //fonction de lecture du fichier et insertion dans l'avl_usine
-//A MODIFIER :
-// - MODIFIER VALEUR SI DEJA PRESENT
-// - VERIFIER TOUS LES MALLOC
+//FONCTION A TESTER
 
 void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
-    char* ligne;
+    char* ligne = NULL;
     while ((ligne = lireLigne(fichier)) != NULL) {
 
         if (ligne[0] == '\0') {
@@ -174,9 +172,14 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
             }
             //usine déja creee
             else {
-                //modifier valeur
+                AVL_USINE* usine = rechercherAdresse(*racine, id_usine);
+                if (usine != NULL){
+                    usine->capte += vol_capte;
+                    usine->traite += vol_capte * (1.0f - fuite / 100.0f);
+                }
             }
         }
         free(ligne);
     }
 }
+

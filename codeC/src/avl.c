@@ -171,7 +171,7 @@ AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h) {
         *h = - *h;
     }
     else if (existDroit(pAVL_USINE)) {
-        pAVL_USINE->pDroit = suppMinAVL_USINE(pAVL_USINE->pDroit, h, &id);
+        pAVL_USINE->pDroit = suppMinAVL_USINE(pAVL_USINE->pDroit, &id, h);
     }
     else {
         tmp = pAVL_USINE;
