@@ -8,8 +8,8 @@ typedef struct avl_usine {
     struct avl_usine* pGauche;
     int equilibre;
     int max;
-    int capte;
-    int traite;
+    int capter;
+    int traiter;
 }AVL_USINE;
 
 
@@ -23,9 +23,7 @@ AVL_USINE* creerAVL_USINE(char* charactere);
 int existeGauche(AVL_USINE* pAVL_USINE);
 int existDroit(AVL_USINE* pAVL_USINE);
 AVL_USINE* insertionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h);
-AVL_USINE* suppMinAVL_USINE(AVL_USINE* pAVL_USINE, char* pe, int *h);
+AVL_USINE* suppMinAVL_USINE(AVL_USINE* pAVL_USINE, char** pe, int *h);
 AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h);
-AVL_USINE* rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id);
-AVL_USINE* rechercherAdresse(AVL_USINE* p, char *id);
 
 #endif // AVL_USINE_H

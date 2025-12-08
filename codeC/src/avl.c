@@ -12,8 +12,8 @@ AVL_USINE* creerAVL_USINE(char* carac) {
     pAVL_USINE->pDroit = NULL;
     pAVL_USINE->equilibre = 0;
     pAVL_USINE->max = 0;
-    pAVL_USINE->capte = 0;
-    pAVL_USINE->traite = 0;
+    pAVL_USINE->capter = 0;
+    pAVL_USINE->traiter = 0;
     return pAVL_USINE;
 }
 
@@ -129,7 +129,7 @@ AVL_USINE* insertionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h) {
     return pAVL_USINE;
 }
 
-AVL_USINE* suppMinAVL_USINE(AVL_USINE* pAVL_USINE, char* pe, int *h) {
+AVL_USINE* suppMinAVL_USINE(AVL_USINE* pAVL_USINE, char** pe, int *h) {
     AVL_USINE* tmp = NULL;
     if (pAVL_USINE->pGauche == NULL) {
         *pe = pAVL_USINE->val;
@@ -171,7 +171,7 @@ AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h) {
         *h = - *h;
     }
     else if (existDroit(pAVL_USINE)) {
-        pAVL_USINE->pDroit = suppMinAVL_USINE(pAVL_USINE->pDroit, &id, h);
+        pAVL_USINE->pDroit = suppMinAVL_USINE(pAVL_USINE->pDroit, &id, h); // Ya un probleme de logique avec h
     }
     else {
         tmp = pAVL_USINE;
@@ -195,25 +195,19 @@ AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h) {
 }
 
 int rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id) {
+    // Renvoie 0 si le code n'a pas trouver l'ID 1 sinon.
+
     if (pAVL_USINE == NULL) {
         return 0;
-    }
-    else if (strcmp(id, pAVL_USINE->val) == 0){
-        return 1;
     }
     else if (strcmp(id, pAVL_USINE->val) < 0) {
         return rechercheAVL_USINE(pAVL_USINE->pGauche, id);
     }
-    else {
+    else if (strcmp(id, pAVL_USINE->val) > 0) {
         return rechercheAVL_USINE(pAVL_USINE->pDroit, id);
     }
-}
-
-AVL_USINE* rechercherAdresse(AVL_USINE* p, char *id) {
-    if (!p) return NULL;
-
-    int cmp = strcmp(id, p->val);
-    if (cmp == 0) return p;
-    else if (cmp < 0) return rechercherAdresse(p->pGauche, id);
-    else return rechercherAdresse(p->pDroit, id);
+    else {
+        // je ne sais pas quoi retourner ici.
+        return 1;
+    }
 }
