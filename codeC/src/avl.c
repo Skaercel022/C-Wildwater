@@ -12,8 +12,8 @@ AVL_USINE* creerAVL_USINE(char* carac) {
     pAVL_USINE->pDroit = NULL;
     pAVL_USINE->equilibre = 0;
     pAVL_USINE->max = 0;
-    pAVL_USINE->capter = 0;
-    pAVL_USINE->traiter = 0;
+    pAVL_USINE->capte = 0;
+    pAVL_USINE->traite = 0;
     return pAVL_USINE;
 }
 

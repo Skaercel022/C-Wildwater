@@ -8,8 +8,8 @@ typedef struct avl_usine {
     struct avl_usine* pGauche;
     int equilibre;
     int max;
-    int capter;
-    int traiter;
+    int capte;
+    int traite;
 }AVL_USINE;
 
 
