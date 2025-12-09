@@ -117,7 +117,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
 
                 *racine = insertionAVL_USINE(*racine, copie, &h);
 
-                AVL_USINE* usine = rechercherAdresse(*racine, copie);
+                AVL_USINE* usine = rechercheAdresse(*racine, copie);
                 if (usine != NULL) {
                     usine->max = vol_max;
                 }
@@ -164,7 +164,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
 
                 *racine = insertionAVL_USINE(*racine, copie, &h);
 
-                AVL_USINE* usine = rechercherAdresse(*racine, copie);
+                AVL_USINE* usine = rechercheAdresse(*racine, copie);
                 if (usine != NULL) {
                     usine->capte = vol_capte;
                     usine->traite = vol_capte * (1.0f - fuite / 100.0f);
@@ -172,7 +172,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
             }
             //usine déja creee
             else {
-                AVL_USINE* usine = rechercherAdresse(*racine, id_usine);
+                AVL_USINE* usine = rechercheAdresse(*racine, id_usine);
                 if (usine != NULL){
                     usine->capte += vol_capte;
                     usine->traite += vol_capte * (1.0f - fuite / 100.0f);

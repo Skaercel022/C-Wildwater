@@ -211,3 +211,18 @@ int rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id) {
         return 1;
     }
 }
+
+AVL_USINE* rechercheAdresse(AVL_USINE* pAVL_USINE, char* id) {
+    if (pAVL_USINE == NULL) {
+        return NULL;
+    }
+    else if (strcmp(id, pAVL_USINE->val) < 0) {
+        return rechercheAdresse(pAVL_USINE->pGauche, id);
+    }
+    else if (strcmp(id, pAVL_USINE->val) > 0) {
+        return rechercheAdresse(pAVL_USINE->pDroit, id);
+    }
+    else {
+        return pAVL_USINE;
+    }
+}
