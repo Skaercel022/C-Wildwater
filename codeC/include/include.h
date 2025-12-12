@@ -10,4 +10,5 @@
 #include "fonction.h"
 #include "arbre.h"
 #include "leaks.h"
+#include "fct_fichier.h"
 #endif // INCLUDE_H
