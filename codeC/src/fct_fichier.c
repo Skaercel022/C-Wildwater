@@ -183,3 +183,119 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
     }
 }
 
+//50 plus petites usines en volume max
+
+// Insère une usine dans un tableau trié selon le champ max
+void insererTrie(AVL_USINE** tableau, int* compteur, int maxUsines, AVL_USINE* usine) {
+    int i = *compteur - 1;
+
+    //si on a moins de 50 elements
+    if (*compteur < maxUsines) {
+        (*compteur)++;
+    }
+    //sinon si l'usine actuelle a un max plus grand que le dernier, on ne l'insere pas
+    else if (usine->max >= tableau[*compteur - 1]->max) {
+        return;
+    }
+
+    //decale vers la droite tant que l'usine insérée a un max plus petit
+    while (i >= 0 && tableau[i]->max > usine->max) {
+        if (i + 1 < maxUsines) {
+            tableau[i + 1] = tableau[i];
+        }
+        i--;
+    }
+
+    //place l'usine à la bonne position
+    tableau[i + 1] = usine;
+}
+
+void parcoursInfixeInsertion(AVL_USINE* noeud, AVL_USINE** tableauUsines, int* compteur) {
+    if (noeud == NULL) {
+        return;
+    }
+
+    parcoursInfixeInsertion(noeud->pGauche, tableauUsines, compteur);
+    insererTrie(tableauUsines, compteur, 50, noeud);
+    parcoursInfixeInsertion(noeud->pDroit, tableauUsines, compteur);
+}
+
+void fichier50PlusPetites(AVL_USINE* racine, const char* nomFichierSortie) {
+    FILE* fichierSortie = fopen(nomFichierSortie, "w");
+    if (fichierSortie == NULL) {
+        exit(53);
+    }
+
+    AVL_USINE* tableauUsines[50];
+    int compteur = 0;
+
+    parcoursInfixe(racine, tableauUsines, &compteur);
+
+    fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
+
+    for (int i = 0; i < compteur; i++) {
+        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+    }
+
+    fclose(fichierSortie);
+}
+
+// 10 plus grandes usines volume max
+
+void insererTrieGrandes(AVL_USINE** tableau, int* compteur, int maxUsines, AVL_USINE* usine) {
+    int i = *compteur - 1;
+
+    if (*compteur < maxUsines) {
+        (*compteur)++;
+    }
+    else if (usine->max <= tableau[*compteur - 1]->max) {
+        return;
+    }
+
+    while (i >= 0 && tableau[i]->max < usine->max) {
+        if (i + 1 < maxUsines) {
+            tableau[i + 1] = tableau[i];
+        }
+        i--;
+    }
+
+    tableau[i + 1] = usine;
+}
+
+void parcoursInfixeInsertionGrandes(AVL_USINE* noeud, AVL_USINE** tableauUsines, int* compteur) {
+    if (noeud == NULL) {
+        return;
+    }
+
+    parcoursInfixeInsertionGrandes(noeud->pGauche, tableauUsines, compteur);
+    insererTrieGrandes(tableauUsines, compteur, 10, noeud);
+    parcoursInfixeInsertionGrandes(noeud->pDroit, tableauUsines, compteur);
+}
+
+void fichier10PlusGrandes(AVL_USINE* racine, const char* nomFichierSortie) {
+    FILE* fichierSortie = fopen(nomFichierSortie, "w");
+    if (fichierSortie == NULL) {
+        exit(53);
+    }
+
+    AVL_USINE* tableauUsines[10];
+    int compteur = 0;
+
+    parcoursInfixeInsertionGrandes(racine, tableauUsines, &compteur);
+
+    fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
+
+    for (int i = 0; i < compteur; i++) {
+        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+    }
+
+    fclose(fichierSortie);
+}
+
+//creer un fichier 10_plus_grandes_usines.csv et 50_plus_petites_usines.csv
+
+
+void creerFichiersRapports(AVL_USINE* racine) {
+    fichier10PlusGrandes(racine, "10_plus_grandes_usines.csv");
+    fichier50PlusPetites(racine, "50_plus_petites_usines.csv");
+}
