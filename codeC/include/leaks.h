@@ -18,7 +18,7 @@ struct liste {
 struct arbre_liste {
     Liste* liste;
     int nb_fuite;
-    int coefficient;  // pour gestion fuite
+    float coefficient;  // pour gestion fuite
 };
 
 typedef struct avl_usine {
