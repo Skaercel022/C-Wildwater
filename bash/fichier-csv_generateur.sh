@@ -11,7 +11,7 @@ case "$cmd" in
 	histo)
 		case "$mode" in  
 
-    	max)
+    	max) 
         	echo "Usine;TraitementMax" > vol_max.dat
         	val=$( grep -E '^-;[^-;]+;-;' c-wildwater_v0.dat | cut -d ';' -f2,4)
     		echo "$val" > valmax.dat
