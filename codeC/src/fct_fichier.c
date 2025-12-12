@@ -1,5 +1,11 @@
 //objectif de cette partie : ouvrir fichier avec les sources et les usines
-//lire les données et modifier les l'avl_usine usine
+//lire les données et modifier l'avl_usine usine
+//creer fichiers avec les 10 plus grandes usines et 50 plus petites usines
+//creer fichier avec toutes les usines triées par ordre alphabétique décroissant
+
+//to do list de chose à faire :
+//supprimer premiere ligne des fichiers csv (entete)
+//convertir les milliers de m3 en millions de m3
 
 #include "../include/include.h"
 
@@ -183,7 +189,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
     }
 }
 
-//50 plus petites usines en volume max
+//fichier avec les 50 plus petites usines en volume max
 
 // Insère une usine dans un tableau trié selon le champ max
 void insererTrie(AVL_USINE** tableau, int* compteur, int maxUsines, AVL_USINE* usine) {
@@ -210,14 +216,14 @@ void insererTrie(AVL_USINE** tableau, int* compteur, int maxUsines, AVL_USINE* u
     tableau[i + 1] = usine;
 }
 
-void parcoursInfixeInsertion(AVL_USINE* noeud, AVL_USINE** tableauUsines, int* compteur) {
+void parcoursInfixeInsertionPetites(AVL_USINE* noeud, AVL_USINE** tableauUsines, int* compteur) {
     if (noeud == NULL) {
         return;
     }
 
-    parcoursInfixeInsertion(noeud->pGauche, tableauUsines, compteur);
+    parcoursInfixeInsertionPetites(noeud->pGauche, tableauUsines, compteur);
     insererTrie(tableauUsines, compteur, 50, noeud);
-    parcoursInfixeInsertion(noeud->pDroit, tableauUsines, compteur);
+    parcoursInfixeInsertionPetites(noeud->pDroit, tableauUsines, compteur);
 }
 
 void fichier50PlusPetites(AVL_USINE* racine, const char* nomFichierSortie) {
@@ -229,7 +235,7 @@ void fichier50PlusPetites(AVL_USINE* racine, const char* nomFichierSortie) {
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
 
-    parcoursInfixe(racine, tableauUsines, &compteur);
+    parcoursInfixeInsertionPetites(racine, tableauUsines, &compteur);
 
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
@@ -240,7 +246,7 @@ void fichier50PlusPetites(AVL_USINE* racine, const char* nomFichierSortie) {
     fclose(fichierSortie);
 }
 
-// 10 plus grandes usines volume max
+//fichier avec les 10 plus grandes usines volume max
 
 void insererTrieGrandes(AVL_USINE** tableau, int* compteur, int maxUsines, AVL_USINE* usine) {
     int i = *compteur - 1;
@@ -292,10 +298,35 @@ void fichier10PlusGrandes(AVL_USINE* racine, const char* nomFichierSortie) {
     fclose(fichierSortie);
 }
 
-//creer un fichier 10_plus_grandes_usines.csv et 50_plus_petites_usines.csv
+//creer fichier de toutes les usines triées par ordre alphabétique decroissant
 
+void fichierUsinesAlphabetiqueDecroissant(AVL_USINE* racine, const char* nomFichierSortie) {
+    FILE* fichierSortie = fopen(nomFichierSortie, "w");
+    if (fichierSortie == NULL) {
+        exit(54);
+    }
+
+    fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
+
+    parcoursDecroissantEcriture(racine, fichierSortie);
+
+    fclose(fichierSortie);
+}
+
+void parcoursDecroissantEcriture(AVL_USINE* noeud, FILE* fichier) {
+    if (noeud == NULL) {
+        return;
+    }
+
+    parcoursDecroissantEcriture(noeud->pDroit, fichier);
+
+    fprintf(fichier, "%s;%d;%d;%d\n", noeud->val, noeud->max, noeud->capte, noeud->traite);
+
+    parcoursDecroissantEcriture(noeud->pGauche, fichier);
+}
 
 void creerFichiersRapports(AVL_USINE* racine) {
     fichier10PlusGrandes(racine, "10_plus_grandes_usines.csv");
     fichier50PlusPetites(racine, "50_plus_petites_usines.csv");
+    fichierUsinesAlphabetiqueDecroissant(racine, "usines_alphabetique_decroissant.csv");
 }
