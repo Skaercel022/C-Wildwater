@@ -9,4 +9,5 @@
 #include "avl_usine.h"
 #include "fonction.h"
 #include "arbre.h"
+#include "leaks.h"
 #endif // INCLUDE_H
