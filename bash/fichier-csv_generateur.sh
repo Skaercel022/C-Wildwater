@@ -7,28 +7,29 @@ if [ ! -f "$fichier" ]; then
     echo "Erreur : fichier introuvable : $fichier"
     exit 1
 fi  
+case "$cmd" in
+	histo)
+		case "$mode" in  
 
-case "$mode" in  
+    	max)
+        	echo "Usine;TraitementMax;Source;Prelevement" > vol_max.dat
+        	val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
+    		echo "$val" > valmax.dat
+        	echo "Fichiers généré : vol_max.dat 
+        	;;
 
-    max)
-        echo "Usine;TraitementMax;Source;Prelevement" > vol_max.dat
-        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
-        echo "$val" > valmax.dat
-        echo "Fichiers généré : vol_max.dat 
+    	source)
+			echo "Usine;TraitementMax;Source;Prelevement" > source.csv
+        	val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
+        	echo "$val" > source.csv
+        	echo "Fichier généré : source.csv"
         ;;
 
-    source)
-		echo "Usine;TraitementMax;Source;Prelevement" > source.csv
-        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
-        echo "$val" > source.csv
-        echo "Fichier généré : source.csv"
-        ;;
-
-    prelevement)
-		echo "Usine;TraitementMax;Source;Prelevement" > prelevement.csv
-        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
-        echo "$val" > prelevement.csv
-        echo "Fichier généré : prelevement.csv"
+    	prelevement)
+			echo "Usine;TraitementMax;Source;Prelevement" > prelevement.csv
+        	val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
+        	echo "$val" > prelevement.csv
+        	echo "Fichier généré : prelevement.csv"
         ;;
 
     *)
@@ -36,7 +37,13 @@ case "$mode" in
         echo "Modes disponibles : max / source / prelevement"
         exit 1
         ;;
-esac
+		esac
+		
+	leaks)
+		echo "Identifiant;TraitementMax;Source;Prelevement" > leaks.csv
+		val=$(grep-E "
+		
+
 
 
 
@@ -67,6 +74,7 @@ case "$mode" in
     	src)
     		echo 
 grep -E '^-;[^-;]+;' c-wildwater_v0.dat | cut -d ';' -f2,4,5
+
 
 
 
