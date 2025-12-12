@@ -12,7 +12,6 @@ typedef struct avl_usine {
     int traite;
 }AVL_USINE;
 
-typedef int (*GetVolumeFunc)(AVL_USINE*);
 
 
 AVL_USINE* rotationDroite(AVL_USINE* pAVL_USINE);

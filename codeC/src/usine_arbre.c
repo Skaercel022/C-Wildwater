@@ -2,29 +2,32 @@
 
 
 
-Abre_liste* creerArbre_liste() {
-    Abre_liste* pArbre_liste = malloc(sizeof(Abre_liste));
-    if (pArbre_liste == NULL) {
-        exit(1);
-    }
-    pArbre_liste->liste = NULL;
-    pArbre_liste->Suivant = NULL;
-    pArbre_liste->nb_fuite = 0;
-    return pArbre_liste;
-}
 
-Liste *creerListe(void* ptr) {
+Liste *creerListe(void* ptr, char* id) {
     Liste* pListe = malloc(sizeof(Liste));
     if (pListe == NULL) {
         exit(1);
     }
     pListe->ptr = ptr;
     pListe->next = NULL;
+    pListe->id = id;
     return pListe;
 }
 
-Abre_liste* insererArbre_liste(Abre_liste* arbre, void* ptr) {
-    Liste* nouvelleListe = creerListe(ptr);
+Arbre_liste* CreerArbre_liste(void* ptr, char* id) {
+    // Crée un Arbre_liste avec un seul élément ptr
+    Arbre_liste* arbre = malloc(sizeof(Arbre_liste));
+    if (arbre == NULL) {
+        exit(1);
+    }
+    arbre->liste = creerListe(ptr,id);
+    arbre->nb_fuite = 0;
+    return arbre;
+}
+
+Arbre_liste* insererArbre_liste(Arbre_liste* arbre, void* ptr, char* id) {
+    //  Inserer ptr à la fin de la liste
+    Liste* nouvelleListe = creerListe(ptr, id);
     if (arbre->liste == NULL) {
         arbre->liste = nouvelleListe;
     }
@@ -34,5 +37,25 @@ Abre_liste* insererArbre_liste(Abre_liste* arbre, void* ptr) {
             current = current->next;
         }
         current->next = nouvelleListe;
+    }
+    return arbre;
+}
+
+Arbre_liste* creationAbre_liste(Arbre_liste* arbre, void* ptr, char* id) {
+    // Ajoute ptr à la liste si elle n'y est pas déjà
+    if (arbre->liste == NULL) {
+        arbre->liste = creerListe(ptr, id);
+        return arbre;
+    }
+    Liste* current = arbre->liste;
+    while (current != NULL) {
+        if (current->ptr == ptr) {
+            return arbre;
+        }
+        if (current->next == NULL) {
+            current->next = creerListe(ptr, id);
+            return arbre;
+        }
+        current = current->next;
     }
 }
