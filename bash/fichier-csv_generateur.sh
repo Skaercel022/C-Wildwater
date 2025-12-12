@@ -12,19 +12,21 @@ case "$mode" in
 
     max)
         echo "Usine;TraitementMax;Source;Prelevement" > vol_max.dat
-        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 "$fichier")
+        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
         echo "$val" > valmax.dat
         echo "Fichiers généré : vol_max.dat 
         ;;
 
     source)
-        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 "$fichier")
+		echo "Usine;TraitementMax;Source;Prelevement" > source.csv
+        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
         echo "$val" > source.csv
         echo "Fichier généré : source.csv"
         ;;
 
     prelevement)
-        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 "$fichier")
+		echo "Usine;TraitementMax;Source;Prelevement" > prelevement.csv
+        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
         echo "$val" > prelevement.csv
         echo "Fichier généré : prelevement.csv"
         ;;
@@ -35,6 +37,8 @@ case "$mode" in
         exit 1
         ;;
 esac
+
+
 
 
 
@@ -63,5 +67,6 @@ case "$mode" in
     	src)
     		echo 
 grep -E '^-;[^-;]+;' c-wildwater_v0.dat | cut -d ';' -f2,4,5
+
 
 
