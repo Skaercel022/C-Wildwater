@@ -1,3 +1,44 @@
+
+#!/bin/bash
+
+
+# Vérification fichier
+if [ ! -f "$fichier" ]; then 
+    echo "Erreur : fichier introuvable : $fichier"
+    exit 1
+fi  
+
+case "$mode" in  
+
+    max)
+        echo "Usine;TraitementMax;Source;Prelevement" > vol_max.dat
+        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 "$fichier")
+        echo "$val" > valmax.dat
+        echo "Fichiers généré : vol_max.dat 
+        ;;
+
+    source)
+        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 "$fichier")
+        echo "$val" > source.csv
+        echo "Fichier généré : source.csv"
+        ;;
+
+    prelevement)
+        val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 "$fichier")
+        echo "$val" > prelevement.csv
+        echo "Fichier généré : prelevement.csv"
+        ;;
+
+    *)
+        echo "Mode inconnu : $mode"
+        echo "Modes disponibles : max / source / prelevement"
+        exit 1
+        ;;
+esac
+
+
+
+
 "if [ "$mode" = "max" ]; then
     echo "Usine,traitementmax">>vol_max.dat
     val=$( grep -E '^-;[^-;]+;-;' c-wildwater_v0.dat | cut -d ';' -f2,4)
@@ -22,4 +63,5 @@ case "$mode" in
     	src)
     		echo 
 grep -E '^-;[^-;]+;' c-wildwater_v0.dat | cut -d ';' -f2,4,5
+
 
