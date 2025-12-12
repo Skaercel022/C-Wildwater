@@ -12,38 +12,46 @@ case "$cmd" in
 		case "$mode" in  
 
     	max)
-        	echo "Usine;TraitementMax;Source;Prelevement" > vol_max.dat
-        	val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
+        	echo "Usine;TraitementMax" > vol_max.dat
+        	val=$( grep -E '^-;[^-;]+;-;' c-wildwater_v0.dat | cut -d ';' -f2,4)
     		echo "$val" > valmax.dat
         	echo "Fichiers généré : vol_max.dat 
         	;;
 
     	source)
-			echo "Usine;TraitementMax;Source;Prelevement" > source.csv
+			echo "Usine/source;TraitementMax;Fuite" > source.csv
         	val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
         	echo "$val" > source.csv
         	echo "Fichier généré : source.csv"
         ;;
 
     	prelevement)
-			echo "Usine;TraitementMax;Source;Prelevement" > prelevement.csv
+			echo "Usine/source;TraitementMax;Fuite" > prelevement.csv
         	val=$(grep -E '^-;[^-;]+;' | cut -d ';' -f2,4,5 )
         	echo "$val" > prelevement.csv
         	echo "Fichier généré : prelevement.csv"
         ;;
 
-    *)
-        echo "Mode inconnu : $mode"
-        echo "Modes disponibles : max / source / prelevement"
-        exit 1
+    	*)
+        	echo "Mode inconnu : $mode"
+        	echo "Modes disponibles : max / source / prelevement"
+    		exit 1
         ;;
 		esac
 		
 	leaks)
-		echo "Identifiant;TraitementMax;Source;Prelevement" > leaks.csv
-		val=$(grep-E "
-		
-
+		echo "Identifiant;TraitementMax;Source;Prelevement" > lfuite.csv
+		val=$(grep-E "ID_USINE" | cut -d ';' -f2,4,5 )
+		echo "$val">leaks.csv
+		echo "Fichier généré: fuite.csv"
+		;;
+*)
+	echo "commande inconnu : $cmd"
+    echo "commandes disponibles : histo / leaks"
+    exit 1
+	;;
+	esac
+	
 
 
 
