@@ -58,4 +58,5 @@ Arbre_liste* creationAbre_liste(Arbre_liste* arbre, void* ptr, char* id) {
         }
         current = current->next;
     }
+    return arbre;
 }

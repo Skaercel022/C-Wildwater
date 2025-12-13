@@ -1,11 +1,11 @@
 #!/bin/bash
 
-START_TIME=$(date +%s%3N)
+start_time=$(date +%s%3N)
 
 erreur_sortie() {
     echo "Erreur: $1" >&2
-    END_TIME=$(date +%s%3N)
-    echo "Durée totale: $((END_TIME - START_TIME)) ms"
+    end_time=$(date +%s%3N)
+    echo "Durée totale: $((end_time - start_time)) ms"
     exit 1
 }
 
@@ -64,6 +64,9 @@ RET=$?
 rm -f "$TMP_FILE"
 
 if [ "$RET" -ne 0 ]; then
+    cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
+    make clean > /dev/null 2>&1
+    cd - > /dev/null || true
     erreur_sortie "Le programme C a retourné une erreur"
 fi
 
@@ -72,8 +75,8 @@ make clean > /dev/null 2>&1
 cd - > /dev/null || true
 
 #fin
-END_TIME=$(date +%s%3N)
+end_time=$(date +%s%3N)
 echo "Traitement terminé avec succès"
-echo "Durée totale: $((END_TIME - START_TIME)) ms"
+echo "Durée totale: $((end_time - start_time)) ms"
 
 exit 0
