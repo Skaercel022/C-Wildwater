@@ -66,11 +66,6 @@ case "$cmd" in
 
 		esac
 
-	
-
-		esac
-
-
 
 	 	Compilation et appel du programme C 
 
