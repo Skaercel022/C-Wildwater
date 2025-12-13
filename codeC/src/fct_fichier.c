@@ -4,8 +4,6 @@
 
 //to do list :
 //convertir les milliers de m3 en millions de m3
-//mettre des floats pour le volume traité
-//modifier le strtrok de la colonne 5
 
 #include "../include/include.h"
 
@@ -82,7 +80,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
         char* col2 = strtok(NULL, ";");
         char* col3 = strtok(NULL, ";");
         char* col4 = strtok(NULL, ";");
-        char* col5 = strtok(NULL, "\0");
+        char* col5 = strtok(NULL, ";");
         
         //erreur ligne csv mal formée
         if (!col1 || !col2 || !col3 || !col4 || !col5) {
@@ -147,7 +145,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                 AVL_USINE* usine = rechercheAdresse(*racine, copie);
                 if (usine != NULL) {
                     usine->capte = vol_capte;
-                    usine->traite = vol_capte * (1.0f - fuite / 100.0f);
+                    usine->traite = vol_capte * (1.0 - fuite / 100.0);
                 }
             }
             //usine déja creee
@@ -155,7 +153,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                 AVL_USINE* usine = rechercheAdresse(*racine, id_usine);
                 if (usine != NULL){
                     usine->capte += vol_capte;
-                    usine->traite += vol_capte * (1.0f - fuite / 100.0f);
+                    usine->traite += vol_capte * (1.0 - fuite / 100.0);
                 }
             }
         }
@@ -218,7 +216,7 @@ void fichier50PlusPetitesMax(AVL_USINE* racine, const char* nomFichierSortie) {
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
     for (int i = 0; i < compteur; i++) {
-        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+        fprintf(fichierSortie, "%s;%d;%d;%f\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
     }
 
     fclose(fichierSortie);
@@ -271,7 +269,7 @@ void fichier50PlusPetitesCapte(AVL_USINE* racine, const char* nomFichierSortie) 
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
     for (int i = 0; i < compteur; i++) {
-        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+        fprintf(fichierSortie, "%s;%d;%d;%f\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
     }
 
     fclose(fichierSortie);
@@ -324,7 +322,7 @@ void fichier50PlusPetitesTraite(AVL_USINE* racine, const char* nomFichierSortie)
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
     for (int i = 0; i < compteur; i++) {
-        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+        fprintf(fichierSortie, "%s;%d;%d;%f\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
     }
 
     fclose(fichierSortie);
@@ -380,7 +378,7 @@ void fichier10PlusGrandesMax(AVL_USINE* racine, const char* nomFichierSortie) {
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
     for (int i = 0; i < compteur; i++) {
-        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+        fprintf(fichierSortie, "%s;%d;%d;%f\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
     }
 
     fclose(fichierSortie);
@@ -433,7 +431,7 @@ void fichier10PlusGrandesCapte(AVL_USINE* racine, const char* nomFichierSortie) 
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
     for (int i = 0; i < compteur; i++) {
-        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+        fprintf(fichierSortie, "%s;%d;%d;%f\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
     }
 
     fclose(fichierSortie);
@@ -486,7 +484,7 @@ void fichier10PlusGrandesTraite(AVL_USINE* racine, const char* nomFichierSortie)
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
 
     for (int i = 0; i < compteur; i++) {
-        fprintf(fichierSortie, "%s;%d;%d;%d\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
+        fprintf(fichierSortie, "%s;%d;%d;%f\n", tableauUsines[i]->val, tableauUsines[i]->max, tableauUsines[i]->capte, tableauUsines[i]->traite);
     }
 
     fclose(fichierSortie);

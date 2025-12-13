@@ -9,7 +9,7 @@ typedef struct avl_usine {
     int equilibre;
     int max;
     int capte;
-    int traite;
+    float traite;
 }AVL_USINE;
 
 
