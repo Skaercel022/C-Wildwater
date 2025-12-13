@@ -67,14 +67,13 @@ case "$cmd" in
 		esac
 
 
-	 	Compilation et appel du programme C 
 
         if [ -f Makefile ]; then
             echo "Compilation du programme C..."
             make
         else
             echo "Makefile introuvable. erreur"
-			exit(1)
+			exit 1
         fi
 
 		
