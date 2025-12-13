@@ -89,7 +89,7 @@ case "$cmd" in
         fi
 
         echo "Exécution du programme C pour le mode $mode..."
-        ./run "$mode" $input_files
+        ./run "$cmd" "$mode" $input_files
         echo "Traitement terminé pour le mode $mode."
         ;;
 
