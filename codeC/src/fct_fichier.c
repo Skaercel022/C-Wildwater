@@ -27,7 +27,7 @@ void fermerFichier(FILE* fichier){
 }
 
 int estVide(const char *s) {
-    return (strcmp(s, "-") == 0);
+    return (s == NULL || strcmp(s, "-") == 0);
 }
 
 //fonction utilitaire permettant de lire une ligne complète d'un fichier peu importe sa longueur
