@@ -13,7 +13,6 @@ typedef struct avl_usine {
 }AVL_USINE;
 
 
-
 AVL_USINE* rotationDroite(AVL_USINE* pAVL_USINE);
 AVL_USINE* rotationGauche(AVL_USINE* pAVL_USINE);
 AVL_USINE* doubleRotationDroite(AVL_USINE* pAVL_USINE);

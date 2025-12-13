@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <limits.h>
+#include "include.h"
+//objectif du main : 2 cas : histo ou leaks
+//histo : ouvre un fichier, cree l'avl_usine, cree les fichiers de sortie
+
 
 int main(){
     printf("Hello world\n");
-    //test printf int max
-    printf("INT_MAX = %d\n", INT_MAX);
     return 0;
 }

@@ -1,16 +1,16 @@
 //objectif de cette partie : ouvrir fichier avec les sources et les usines
 //lire les données et modifier l'avl_usine usine
-//creer fichiers avec les 10 plus grandes usines et 50 plus petites usines
-//creer fichier avec toutes les usines triées par ordre alphabétique décroissant
+//creer fichiers avec les 10 plus grandes usines et 50 plus petites usines triées par ordre alphabétique décroissant
 
-//to do list de chose à faire :
-//supprimer premiere ligne des fichiers csv (entete)
+//to do list :
 //convertir les milliers de m3 en millions de m3
+//mettre des floats pour le volume traité
+//modifier le strtrok de la colonne 5
 
 #include "../include/include.h"
 
 //fonction d'ouverture de fichier
-FILE* ouvrirFichier(char* nom_fichier){
+FILE* ouvrirFichierEcriture(char* nom_fichier){
     FILE* fichier = fopen(nom_fichier, "r");
     if(fichier == NULL){
         exit(50);
@@ -82,7 +82,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
         char* col2 = strtok(NULL, ";");
         char* col3 = strtok(NULL, ";");
         char* col4 = strtok(NULL, ";");
-        char* col5 = strtok(NULL, ";");
+        char* col5 = strtok(NULL, "\0");
         
         //erreur ligne csv mal formée
         if (!col1 || !col2 || !col3 || !col4 || !col5) {
@@ -161,12 +161,6 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
         }
         free(ligne);
     }
-}
-
-int comparerUsines(const void* a, const void* b) {
-    AVL_USINE* ua = *(AVL_USINE**)a;
-    AVL_USINE* ub = *(AVL_USINE**)b;
-    return -strcmp(ua->val, ub->val); //decroissant
 }
 
 //fichier avec les 50 plus petites usines en volume max
