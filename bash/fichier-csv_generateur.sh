@@ -19,7 +19,8 @@ case "$cmd" in
         			echo "Usine;TraitementMax" > vol_max.dat
         			val=$( grep -E '^-;[^-;]+;-;' c-wildwater_v0.dat | cut -d ';' -f2,4)
     				echo "$val" > vol_max.dat
-        			echo "Fichiers généré : vol_max.dat" 
+        			echo "Fichiers généré : vol_max.dat"
+					input_files="vol_max.dat"
         			;;
 
     			src)
@@ -27,6 +28,7 @@ case "$cmd" in
         			val=$(grep -E '^-;[^-;]+;' $fichier | cut -d ';' -f2,4,5 )
         			echo "$val" > source.csv
         			echo "Fichier généré : source.csv"
+					input_files="source.csv"
        				;;
 
     			prelevement)
@@ -34,6 +36,7 @@ case "$cmd" in
         			val=$(grep -E '^-;[^-;]+;' $fichier | cut -d ';' -f2,4,5 )
         			echo "$val" > prelevement.csv
         			echo "Fichier généré : prelevement.csv"
+					input_files="prelevement.csv"
         			;;
 
     			*)
@@ -43,7 +46,27 @@ case "$cmd" in
         			;;
 		esac
 	
-		;;
+		esac
+
+	 	Compilation et appel du programme C 
+        if [ -f Makefile ]; then
+            echo "Compilation du programme C..."
+            make
+        else
+            echo "Makefile introuvable. erreur"
+			exit(1)
+        fi
+		
+		if [ ! -x "./mon_programme_C" ]; then
+            echo "Erreur : l'exécutable du programme C n'existe pas."
+            exit 1
+        fi
+
+        echo "Exécution du programme C pour le mode $mode..."
+        ./mon_programme_C "$mode" $input_files
+
+        echo "Traitement terminé pour le mode $mode."
+        ;;
 	
 	leaks)
 		echo "Identifiant;TraitementMax;fuite" > fuite.csv
@@ -57,8 +80,8 @@ case "$cmd" in
     	exit 1
 	;;
 esac
-	
 
+   
 
 
 
