@@ -1,0 +1,14 @@
+set output 'histogram.png'
+set terminal png
+set datafile separator ";"
+set style data histogram
+set style histogram cluster gap 1
+set style fill solid border -1
+set boxwidth 0.5
+set title "Histogramme des volumes maximum traite"
+set xlabel "ID Usines"
+set ylabel "Volume (M.m3.year-1)"
+set grid ytics
+set key off
+set yrange [0.0:1.2]
+plot "vol_max_50_petites.csv" using 2:xtic(1) title 'Volume max traite' linecolor rgb '#237493'
