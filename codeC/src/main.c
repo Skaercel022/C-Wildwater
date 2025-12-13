@@ -10,8 +10,8 @@ int main(){
     fermerFichier(fichier);
 
     creerFichiersVMax(racine);
-    creerFichiersVTraite(racine);
-    creerFichiersVCapte(racine);
+    //creerFichiersVTraite(racine);
+    //creerFichiersVCapte(racine);
 
     suppressionCompleteAVL_USINE(racine);
 
