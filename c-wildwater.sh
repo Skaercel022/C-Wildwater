@@ -79,6 +79,75 @@ cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
 make clean > /dev/null 2>&1
 cd - > /dev/null || true
 
+case "$TYPE" in
+    max)
+        FILE_SMALL="vol_max_50_petites.csv"
+        FILE_BIG="vol_max_10_grandes.csv"
+        COL=2
+        TITLE="Capacité maximale de traitement"
+        ;;
+    src)
+        FILE_SMALL="vol_capte_50_petites.csv"
+        FILE_BIG="vol_capte_10_grandes.csv"
+        COL=3
+        TITLE="Volume total capté"
+        ;;
+    real)
+        FILE_SMALL="vol_traite_50_petites.csv"
+        FILE_BIG="vol_traite_10_grandes.csv"
+        COL=4
+        TITLE="Volume réellement traité"
+        ;;
+esac
+
+gnuplot << EOF
+set terminal pngcairo size 1600,800
+set output "${FILE_SMALL%.csv}.png"
+
+set datafile separator ";"
+
+set style fill solid 1.0
+set style line 1 lc rgb "#1f77b4"
+set boxwidth 0.9
+
+set yrange [0:*]
+set grid ytics
+set key off
+
+set title "${TITLE} – 50 plus petites usines"
+set xlabel "Usines"
+set ylabel "Volume (M.m³ / an)"
+
+set xtics rotate by -45 font ",8"
+
+plot "${FILE_SMALL}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
+     with boxes ls 1
+EOF
+
+gnuplot << EOF
+set terminal pngcairo size 1400,800
+set output "${FILE_BIG%.csv}.png"
+
+set datafile separator ";"
+
+set style fill solid 1.0
+set style line 1 lc rgb "#1f77b4"
+set boxwidth 0.9
+
+set yrange [0:*]
+set grid ytics
+set key off
+
+set title "${TITLE} – 10 plus grandes usines"
+set xlabel "Usines"
+set ylabel "Volume (M.m³ / an)"
+
+set xtics rotate by -30 font ",10"
+
+plot "${FILE_BIG}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
+     with boxes ls 1
+EOF
+
 #fin
 end_time=$(date +%s%3N)
 echo "Traitement terminé avec succès"

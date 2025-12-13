@@ -1,3 +1,0 @@
-Numero erreur : Description
-1 : Problème argument
-2 : Compilation

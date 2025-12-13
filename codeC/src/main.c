@@ -25,6 +25,7 @@ int main(int argc, char** argv) {
             creerFichiersVTraite(racine);
         }
         else{
+            suppressionCompleteAVL_USINE(racine);
             exit(101);
         }
         suppressionCompleteAVL_USINE(racine);
