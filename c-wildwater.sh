@@ -130,7 +130,7 @@ case "$cmd" in
 
 		
 
-		if [ ! -x "./mon_programme_C" ]; then
+		if [ ! -x "./run" ]; then
 
             echo "Erreur : l'exécutable du programme C n'existe pas."
 
@@ -142,7 +142,7 @@ case "$cmd" in
 
         echo "Exécution du programme C pour le mode $mode..."
 
-        ./mon_programme_C "$mode" $input_files
+        ./run "$mode" $input_files
 
 
 
