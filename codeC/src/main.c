@@ -3,7 +3,36 @@
 //histo : ouvre un fichier, cree l'avl_usine, cree les fichiers de sortie
 
 
-int main(){
+int main(int argc, char** argv) {
+    
+    if (argc != 4){
+        exit(100);
+    }
+        
+    if (strcmp(argv[1],"histo") == 0){
+        FILE* fichier = ouvrirFichierEcriture(argv[3]);
+        AVL_USINE* racine = NULL;
+        lectureFichierVersAVL(fichier, &racine);
+        fermerFichier(fichier);
+
+        if(strcmp(argv[2],"max") == 0){
+            creerFichiersVMax(racine);
+        }
+        else if(strcmp(argv[2],"src") == 0){
+            creerFichiersVCapte(racine);
+        }
+        else if(strcmp(argv[2],"real") == 0){
+            creerFichiersVTraite(racine);
+        }
+        else{
+            exit(101);
+        }
+        suppressionCompleteAVL_USINE(racine);
+    }
+    
+
+    
+    /*
     FILE* fichier = ouvrirFichierEcriture("c-wildwater_v3.dat");
     AVL_USINE* racine = NULL;
     lectureFichierVersAVL(fichier, &racine);
@@ -14,6 +43,7 @@ int main(){
     //creerFichiersVCapte(racine);
 
     suppressionCompleteAVL_USINE(racine);
+    */
 
     return 0;
 }

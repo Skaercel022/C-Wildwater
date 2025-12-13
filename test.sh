@@ -11,7 +11,8 @@ erreur_sortie() {
 
 #verif arg
 if [ "$#" -ne 3 ]; then
-    erreur_sortie "Usage 1 : $0 <fichier_donnees> histo <max|src|real>"
+    erreur_sortie "Usage 1 : $0 <fichier_donnees> histo <max|src|real>
+        Usage 2 : $0 <fichier_donnees> leaks <ID_Usine>"
 fi
 
 DATA_FILE="$1"
@@ -51,7 +52,11 @@ cd - > /dev/null || erreur_sortie "Erreur retour dossier"
 #filtrage données avec grep
 TMP_FILE="/tmp/cwildwater_filtered_$$.csv"
 
-grep -E "^-;[^;]+;[^-;]+;[^-;]+;[^;]+" "$DATA_FILE" > "$TMP_FILE"
+
+{
+    grep -E "^-;[^-;]+;-;" "$DATA_FILE"
+    grep -E "^-;[^;]*;[^-;]*;[^-;]*;[^;]*" "$DATA_FILE"
+} > "$TMP_FILE"
 
 if [ ! -s "$TMP_FILE" ]; then
     erreur_sortie "Aucune donnée valide après filtrage"

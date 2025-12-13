@@ -9,10 +9,8 @@
 
 //fonction d'ouverture de fichier
 FILE* ouvrirFichierEcriture(char* nom_fichier) {
-    char chemin[512];
-    snprintf(chemin, sizeof(chemin), "../%s", nom_fichier);
 
-    FILE* fichier = fopen(chemin, "r");
+    FILE* fichier = fopen(nom_fichier, "r");
     if (fichier == NULL) {
         exit(50);
     }

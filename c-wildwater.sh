@@ -1,133 +1,87 @@
 #!/bin/bash
 
-#verifie qu'il y'ait au moins un argument
-if [ $# -lt 1 ]; then
-    echo "Erreur : aucune commande fournie."
-    echo "4 Usage possibles :"
-    echo "Usage 1 : $0 histo max"
-    echo "Usage 2 : $0 histo src"
-    echo "Usage 3 : $0 histo real"
-    echo "Usage 4 : $0 leaks "ID_USINE""
+start_time=$(date +%s%3N)
+
+erreur_sortie() {
+    echo "Erreur: $1" >&2
+    end_time=$(date +%s%3N)
+    echo "Durée totale: $((end_time - start_time)) ms"
     exit 1
+}
+
+#verif arg
+if [ "$#" -ne 3 ]; then
+    erreur_sortie "Usage 1 : $0 <fichier_donnees> histo <max|src|real>
+        Usage 2 : $0 <fichier_donnees> leaks <ID_Usine>"
 fi
 
+DATA_FILE="$1"
+MODE="$2"
+TYPE="$3"
 
-#
+if [ ! -f "$DATA_FILE" ]; then
+    erreur_sortie "Fichier de données introuvable"
+fi
 
-#!/bin/bash
+if [ "$MODE" != "histo" ]; then
+    erreur_sortie "Mode invalide (attendu: histo)"
+fi
 
-
-
-
-
-# Vérification fichier
-
-fichier="$1"
-cmd="$2"
-mode="$3"
-
-
-
-if [ ! -f "$fichier" ]; then 
-    echo "Erreur : fichier introuvable : $fichier"
-    exit 1
-fi  
-case "$cmd" in
-		histo)
-		case "$mode" in  
-		
-    			max)
-        			echo "Usine;TraitementMax" > vol_max.dat
-        			val=$( grep -E '^-;[^-;]+;-;' c-wildwater_v0.dat | cut -d ';' -f2,4)
-    				echo "$val" >> vol_max.dat
-        			echo "Fichiers généré : vol_max.dat"
-					input_files="vol_max.dat"
-        			;;
-    			src)
-				    echo "Usine/source;TraitementMax;Fuite" > source.csv
-        			val=$(grep -E '^-;[^-;]+;' $fichier | cut -d ';' -f2,4,5 )
-        			echo "$val" >> source.csv
-        			echo "Fichier généré : source.csv"
-					input_files="source.csv"
-       				;;
-    			prelevement)
-				    echo "Usine/source;TraitementMax;Fuite" > prelevement.csv
-        			val=$(grep -E '^-;[^-;]+;' $fichier | cut -d ';' -f2,4,5 )
-        			echo "$val" >> prelevement.csv
-        			echo "Fichier généré : prelevement.csv"
-					input_files="prelevement.csv"
-        			;;
-
-    			*)
-        			echo "Mode inconnu : $mode"
-        			echo "Modes disponibles : max / source / prelevement"
-    				exit 1
-        			;;
-
-		esac
-
-
-
-        if [ -f Makefile ]; then
-            echo "Compilation du programme C..."
-            make
-        else
-            echo "Makefile introuvable. erreur"
-			exit 1
-        fi
-
-		
-		if [ ! -x "./run" ]; then
-            echo "Erreur : l'exécutable du programme C n'existe pas."
-            exit 1
-        fi
-
-        echo "Exécution du programme C pour le mode $mode..."
-        ./run "$cmd" "$mode" $input_files
-        echo "Traitement terminé pour le mode $mode."
+case "$TYPE" in
+    max|src|real)
         ;;
-
-	
-
-	leaks)
-		echo "Identifiant;TraitementMax;fuite" > fuite.csv
-		val=$(grep -E "ID_USINE" $fichier | cut -d ';' -f2,4,5 )
-		echo "$val">>fuite.csv
-
-		echo "Fichier généré: fuite.csv"
-
-		;;
-
-	*)
-
-	echo "commande inconnu : $cmd"
-
-    	echo "commandes disponibles : histo / leaks"
-
-    	exit 1
-
-	;;
-
+    *)
+        erreur_sortie "Type histogramme invalide (max | src | real)"
+        ;;
 esac
 
+#compilation
+if [ ! -d "codeC" ]; then
+    erreur_sortie "Dossier codeC introuvable"
+fi
+
+cd codeC || erreur_sortie "Impossible d'entrer dans codeC"
+
+if [ ! -x "./run" ]; then
+    echo "Compilation du programme C..."
+    make || erreur_sortie "Échec de la compilation"
+fi
+
+cd - > /dev/null || erreur_sortie "Erreur retour dossier"
+
+#filtrage données avec grep
+TMP_FILE="/tmp/cwildwater_filtered_$$.csv"
 
 
-   
+{
+    grep -E "^-;[^-;]+;-;" "$DATA_FILE"
+    grep -E "^-;[^;]*;[^-;]*;[^-;]*;[^;]*" "$DATA_FILE"
+} > "$TMP_FILE"
 
+if [ ! -s "$TMP_FILE" ]; then
+    erreur_sortie "Aucune donnée valide après filtrage"
+fi
 
+#execution programme
+./codeC/run histo "$TYPE" "$TMP_FILE"
+RET=$?
 
+rm -f "$TMP_FILE"
 
+if [ "$RET" -ne 0 ]; then
+    cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
+    make clean > /dev/null 2>&1
+    cd - > /dev/null || true
+    erreur_sortie "Le programme C a retourné une erreur"
+fi
 
+cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
+make clean > /dev/null 2>&1
+cd - > /dev/null || true
 
+#fin
+end_time=$(date +%s%3N)
+echo "Traitement terminé avec succès"
+echo "Durée totale: $((end_time - start_time)) ms"
 
-
-
-
-
-
-
-
-
-
-
-
+exit 0
