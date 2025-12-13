@@ -33,7 +33,7 @@ if [ ! -f "$fichier" ]; then
     exit 1
 fi  
 case "$cmd" in
-	h	histo)
+		histo)
 		case "$mode" in  
 		
     			max)
