@@ -21,16 +21,6 @@ struct arbre_liste {
     float coefficient;  // pour gestion fuite
 };
 
-typedef struct avl_usine {
-    char* val;
-    struct avl_usine* pDroit;
-    struct avl_usine* pGauche;
-    int equilibre;
-    int max;
-    int capte;
-    int traite;
-}AVL_USINE;
-
 
 Liste* creerListe(void* ptr, char* id);
 Arbre_liste* CreerArbre_liste(void* ptr, char* id);

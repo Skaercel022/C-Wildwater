@@ -8,9 +8,12 @@
 #include "../include/include.h"
 
 //fonction d'ouverture de fichier
-FILE* ouvrirFichierEcriture(char* nom_fichier){
-    FILE* fichier = fopen(nom_fichier, "r");
-    if(fichier == NULL){
+FILE* ouvrirFichierEcriture(char* nom_fichier) {
+    char chemin[512];
+    snprintf(chemin, sizeof(chemin), "../%s", nom_fichier);
+
+    FILE* fichier = fopen(chemin, "r");
+    if (fichier == NULL) {
         exit(50);
     }
     return fichier;

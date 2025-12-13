@@ -226,3 +226,12 @@ AVL_USINE* rechercheAdresse(AVL_USINE* pAVL_USINE, char* id) {
         return pAVL_USINE;
     }
 }
+
+void suppressionCompleteAVL_USINE(AVL_USINE* pAVL_USINE) {
+    if (pAVL_USINE == NULL) {
+        return;
+    }
+    suppressionCompleteAVL_USINE(pAVL_USINE->pGauche);
+    suppressionCompleteAVL_USINE(pAVL_USINE->pDroit);
+    free(pAVL_USINE);
+}

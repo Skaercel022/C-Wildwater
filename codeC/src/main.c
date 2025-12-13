@@ -4,6 +4,16 @@
 
 
 int main(){
-    printf("Hello world\n");
+    FILE* fichier = ouvrirFichierEcriture("c-wildwater_v3.dat");
+    AVL_USINE* racine = NULL;
+    lectureFichierVersAVL(fichier, &racine);
+    fermerFichier(fichier);
+
+    creerFichiersVMax(racine);
+    creerFichiersVTraite(racine);
+    creerFichiersVCapte(racine);
+
+    suppressionCompleteAVL_USINE(racine);
+
     return 0;
 }

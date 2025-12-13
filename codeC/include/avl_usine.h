@@ -26,5 +26,6 @@ AVL_USINE* suppMinAVL_USINE(AVL_USINE* pAVL_USINE, char** pe, int *h);
 AVL_USINE* suppressionAVL_USINE(AVL_USINE* pAVL_USINE, char* id, int* h);
 AVL_USINE* rechercheAdresse(AVL_USINE* pAVL_USINE, char* id);
 int rechercheAVL_USINE(AVL_USINE* pAVL_USINE, char* id);
+void suppressionCompleteAVL_USINE(AVL_USINE* pAVL_USINE);
 
 #endif // AVL_USINE_H
