@@ -2,6 +2,9 @@
 
 
 
+AVL_Fuite* constructeurAVL(char* id){
+    return NULL;
+}
 
 Liste *creerListe(void* ptr, char* id) {
     Liste* pListe = malloc(sizeof(Liste));
@@ -59,4 +62,26 @@ Arbre_liste* creationAbre_liste(Arbre_liste* arbre, void* ptr, char* id) {
         current = current->next;
     }
     return arbre;
+}
+
+AVL_Fuite* InsertionAVL(AVL_Fuite* racine, char* id){
+    return NULL;
+}
+
+Arbre_liste* recherche(AVL_Fuite* racine, char* id){
+    if (racine == NULL){
+        return NULL;
+    }
+    if (strcmp(id, racine->id) == 0){
+        return racine->parents;
+    }
+    else if (strcmp(id, racine->id) < 0){
+        return recherche(racine->pGauche, id);
+    }
+    else if(strcmp(id, racine->id) > 0){
+        return recherche(racine->pDroit, id);
+    }
+    else{
+        return NULL;
+    }
 }
