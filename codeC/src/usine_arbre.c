@@ -1,7 +1,12 @@
 #include "../include/include.h"
 
 
+// Constructeur a faire pour l'avl des fuites
+// et les fonctions d'insertion/recherche
 
+AVL* constructeurAVL(char *id){
+    return NULL;
+}
 
 Liste *creerListe(void* ptr, char* id) {
     Liste* pListe = malloc(sizeof(Liste));
@@ -59,4 +64,26 @@ Arbre_liste* creationAbre_liste(Arbre_liste* arbre, void* ptr, char* id) {
         current = current->next;
     }
     return arbre;
+}
+
+AVL* InsertionAVL(AVL* racine, char* id){
+    return NULL;
+}
+
+Abre_liste* recherche(AVL* racine, char* id){
+    if (racine == NULL){
+        return NULL;
+    }
+    if (strcmp(id, racine->id) == 0){
+        return racine->parents;
+    }
+    else if (strcmp(id, racine->id) < 0){
+        return recherche(racine->pGauche, id);
+    }
+    else if(strcmp(id, racine->id) > 0){
+        return recherche(racine->pDroit, id);
+    }
+    else{
+        return NULL;
+    }
 }

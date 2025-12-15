@@ -22,6 +22,16 @@ struct arbre_liste {
 };
 
 
+typedef struct _avl{
+    char* id;
+    Arbre_liste* parents; // liste des parents
+    float Volume;
+    float fuites;
+    struct _avl* pGauche;
+    struct _avl* pDroit;
+    int equilibre;
+}AVL;
+
 Liste* creerListe(void* ptr, char* id);
 Arbre_liste* CreerArbre_liste(void* ptr, char* id);
 Arbre_liste* insererArbre_liste(Arbre_liste* arbre, void* ptr, char* id);
