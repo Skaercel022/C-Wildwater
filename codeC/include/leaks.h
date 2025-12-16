@@ -1,7 +1,7 @@
 #ifndef LEAKS_H
 #define LEAKS_H
 
-
+#define LONGUEUR_ID 64
 
 // Déclarations anticipées
 typedef struct liste Liste;
@@ -21,27 +21,40 @@ struct arbre_liste {
     float coefficient;  // pour gestion fuite
 };
 
-
-typedef enum{
-    Parsing_OK,
-    NB_COLONNES_INCORRECT,
-    FORMAT_INCORRECT,
-}Code_Error;
-
-typedef struct _avl{
+typedef struct avl_fuites{
     char* id;
-    Arbre_liste* parents; // liste des parents
-    float Volume;
-    float fuites;
-    struct _avl* pGauche;
-    struct _avl* pDroit;
+    float fuite;
+    struct avl_fuites* pGauche;
+    struct avl_fuites* pDroit;
     int equilibre;
-}AVL_Fuite;
+    Arbre_liste* ptr; // pointeurs vers l'arbre de fuites
+}AVL_FUITES;
 
-Liste* creerListe(void* ptr, char* id);
-Arbre_liste* CreerArbre_liste(void* ptr, char* id);
-Arbre_liste* insererArbre_liste(Arbre_liste* arbre, void* ptr, char* id);
-Arbre_liste* creationAbre_liste(Arbre_liste* arbre, void* ptr, char* id);
+
+typedef struct {
+    char id_usine[LONGUEUR_ID];
+    char id_amont[LONGUEUR_ID];
+    char id_aval[LONGUEUR_ID];
+    double Volume;
+    double fuite;
+}LignesCSV;
+
+typedef enum {
+    Parsing_OK,
+    Erreur_Allocation,
+    Erreur_Format_Token,
+    Erreur_Champ_Vide,
+    Erreur_NB_colonnes,
+}Code_Erreur;
+
+
+Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat);
+AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h);
+LignesCSV creerLigneCSV();
+AVL_FUITES* constructeurAVL(LignesCSV* ligne);
+Arbre_liste* recherche(AVL_FUITES* racine, char* id);
+
+
 
 
 
