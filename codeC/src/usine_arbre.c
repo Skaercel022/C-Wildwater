@@ -19,6 +19,9 @@ Arbre_liste* constructeurArbre(LignesCSV* ligne){
     Arbre->nb_enfant=0;
     Arbre->coefficient_parent=1.0;
     Arbre->Volume_parent=ligne->Volume;
+    // Copie de l'id_usine
+    Arbre->id_usine=malloc(strlen(ligne->id_usine)+1);
+    strcpy(Arbre->id_usine, ligne->id_usine);
     return Arbre;
 }
 
@@ -66,23 +69,22 @@ Code_Erreur ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
 Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat){
     // Sépare la ligne en tokens et remplit le struct LignesCSV
     // Vérifie si les pointeurs sont valides
-    if (ligne == NULL || resultat == NULL) {
-        return Erreur_Format_Token;
-    }
+    if (ligne == NULL || resultat == NULL) return Erreur_Format_Token;
+
     // Vérifie si la ligne est vide
     char* ligne_copy = strdup(ligne); // Crée une copie en allouant directement de la mémoire
     if (ligne_copy == NULL) {
         return Erreur_Allocation;
     }
 
-    char* token;
+    char* token[5];
     const char delimiteur[]= ";";
     int colonne_count = 0;
     // Utilisation de strtok pour diviser la ligne en tokens
     // strtok modifie la chaîne d'origine, donc on travaille sur une copie
     token = strtok(ligne_copy, delimiteur);
 
-    while (token!=NULL) {
+    while (token!=NULL && colonne_count < 5) {
         switch (colonne_count) {
             case 0: // Id usine
                 strncpy(resultat->id_usine, token, LONGUEUR_ID - 1);
@@ -112,7 +114,7 @@ Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat){
 
     free(ligne_copy);
 
-    if (colonne_count -1 != 5 ) {
+    if (colonne_count != 5 ) {
         return Erreur_NB_colonnes;
     }
 
@@ -209,8 +211,17 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h){
     }
 }
 
+Liste* rechercheliste(Liste* liste, Arbre_liste* id){
+    while (liste != NULL){
+        if (strcmp(liste->enfant->id_usine, id->id_usine) == 0){
+            return liste;
+        }
+        liste = liste->next;
+    }
+    return NULL;
+}
 
-Arbre_liste* recherche(AVL_FUITES* racine, char* id){
+Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
     if (racine == NULL){
         return NULL;
     }
@@ -226,4 +237,14 @@ Arbre_liste* recherche(AVL_FUITES* racine, char* id){
     else{
         return NULL;
     }
+}
+
+Liste* creationArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_usines){
+    if(racine == NULL || ligne == NULL){
+        return liste_usines;
+    }
+    // Recherche de l'arbre de l'usine amont
+    Liste* liste_amont=rechercheliste(liste_usines, rechercheArbre(racine, ligne->id_amont));
+    if (liste_amont == NULL){
+        // L'usine amont n'existe pas encore dans la liste, on la crée
 }

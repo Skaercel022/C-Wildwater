@@ -14,15 +14,15 @@ struct liste {
 };
 
 struct arbre_liste {
-    Liste* liste;
+    Liste** liste;
+    char id[LONGUEUR_ID];
     int nb_enfant;
     float coefficient_parent;  // pour gestion fuite
     double Volume_parent;
 };
 
 typedef struct avl_fuites{
-    char* id;
-    float fuite;
+    char id[LONGUEUR_ID];
     struct avl_fuites* pGauche;
     struct avl_fuites* pDroit;
     int equilibre;
@@ -52,7 +52,7 @@ Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat);
 AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h);
 LignesCSV creerLigneCSV();
 AVL_FUITES* constructeurAVL(LignesCSV* ligne);
-Arbre_liste* recherche(AVL_FUITES* racine, char* id);
+Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id);
 
 
 
