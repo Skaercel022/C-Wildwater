@@ -1,7 +1,7 @@
 #include "../include/include.h"
 
 // faire le coeffficient de fuites
-
+// Vérifier la fonction InsertionAVL
 
 // Création des structures :
 
@@ -292,16 +292,101 @@ Liste* creationNoeudArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_arb
     if(racine == NULL || ligne == NULL){
         return liste_arbres;
     }
-    // Recherche de l'arbre de l'usine amont
-    Arbre_liste* liste_amont=rechercheliste(liste_arbres, rechercheArbre(racine, ligne->id_amont)); // jesuis sur le Noeud parent
+    if(arbre_amont == NULL){
+        return liste_arbres;
+    }
+    Arbre_liste* parent=rechercheArbre(racine, ligne->id_amont); // je récupère le noeud parent
     Arbre_liste* nouvel_arbre=constructeurArbre(ligne); // je crée le noeud enfant
-    if(liste_amont!=NULL){
-        ajouter_enfant(liste_amont, nouvel_arbre);
+    if (nouvel_arbre == NULL){
+        return liste_arbres;
+    }
+    if(parent!=NULL){
+        Code_Erreur erreur=ajouter_enfant(parent, nouvel_arbre);
+        // Petite Verification d'erreur
+        if(erreur != Parsing_OK){
+            free(nouvel_arbre);
+            return liste_arbres;
+        }
         return liste_arbres;
     }
     else{
-        free(nouvel_arbre);
-        return liste_arbres;
+        Liste* nouveau_noeud = constructeurListe(nouvel_arbre); // usine principale donc pas de parent dans le fichier
+        if (nouveau_noeud == NULL) {
+            free(nouvel_arbre);
+            return liste_arbres;
+        }
+        nouveau_noeud->next = liste_arbres;
+        liste_arbres = nouveau_noeud;
     }
     return NULL;
+}
+
+// Calcule des fuites totales
+
+double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
+    if (noeud == NULL || volume_entrant <= 0.0 || noeud->nb_enfant == 0) {
+        return 0.0;
+    }
+
+    double total_fuites = 0.0;
+    double volume_par_enfant = volume_entrant / noeud->nb_enfant;
+    // Parcourir la liste des enfants
+    Liste* liste = noeud->liste;
+    while (liste != NULL) {
+        if(liste-enfant !=NULL){
+            double fuite_enfant = volume_par_enfant * (liste->enfant->coefficient_parent /100.0);
+            total_fuites += fuite_enfant;
+            // Appel récursif pour les enfants
+            total_fuites += calculer_fuites_rec(liste->enfant, volume_par_enfant)
+        }
+    }
+
+    return total_fuites;
+}
+
+
+
+double calcule_fuites(const char* nom_fichier, const char* id){
+    FILE* fichier = fopen(nom_fichier, "r");
+    if (fichier == NULL) {
+        perror("Erreur lors de l'ouverture du fichier");
+        return -1.0;
+    }
+    AVL_FUITES* racine = NULL;
+    Liste* liste_arbres = NULL;
+
+    LignesCSV* ligne = creerLigneCSV();
+    if (ligne == NULL) {
+        fclose(fichier);
+        return -1.0;
+    }
+    while(lireEtParserLigne(fichier, ligne) == Parsing_OK){
+        AVL_FUITES* NoeudAVL = InsertionAVL(racine, ligne, NULL);
+        if (NoeudAVL == NULL) {
+            free(ligne);
+            fclose(fichier);
+            return -1.0;
+        }
+        racine = NoeudAVL; // mise à jour de la racine de l'AVL apres une potentielle rotation
+        Arbre_liste* arbre = constructeurArbre(ligne); // je construit l'arbre de fuites
+        if (arbre == NULL) {
+            free(ligne);
+            fclose(fichier);
+            return -1.0;
+        }
+        NoeudAVL->ptr = arbre; // je lie l'arbre à son noeud AVL
+        liste_arbres = creationNoeudArbre(racine, ligne, liste_arbres); // je crée les liens entre les arbres
+        if (liste_arbres == NULL) {
+            free(ligne);
+            fclose(fichier);
+            return -1.0;
+        }
+    }
+    free(ligne);
+    fclose(fichier);
+    // Recherche de l'arbre correspondant à l'ID donné
+    Arbre_liste* arbre_cible = rechercheArbre(racine, (char*) id); // on passe d'un const char a un char*
+    if (arbre_cible == NULL) {
+
+
 }
