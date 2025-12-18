@@ -81,9 +81,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
             exit(60);
         }
         
-        //-----------------------------------
         //ligne "usine" on ajouter volume max
-        //-----------------------------------
         if (estVide(col1) && estVide(col3) && !estVide(col4) && estVide(col5)) {
             char* id_usine = col2;
             int vol_max = atoi(col4);
@@ -114,9 +112,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                 }
             }
         }
-        //------------------------------------------------------
         //ligne "source->usine" on ajouter volume capte et fuite
-        //------------------------------------------------------
         else if (estVide(col1) && !estVide(col2) && !estVide(col3) && !estVide(col4) && !estVide(col5)) {
             char* id_usine = col3;
             int vol_capte = atoi(col4);
@@ -166,7 +162,7 @@ int partitionUsines(AVL_USINE** tab, int bas, int haut) {
     int i = bas - 1;
 
     for (int j = bas; j < haut; j++) {
-        //ordre decorissant
+        //ordre decroissant
         if (strcmp(tab[j]->val, pivot) > 0) {
             i++;
             echangerUsines(&tab[i], &tab[j]);
