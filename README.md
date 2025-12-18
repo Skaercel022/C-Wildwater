@@ -12,7 +12,6 @@ Ce projet à été réalisé par 3 étudiants en deuxième année de classe pré
   - [Installation](#installation)
 - [Utilisation](#utilisation)
 - [Structure du projet](#structure-du-projet)
-- [Licence](#licence)
 
 ## Démarrage
 
@@ -72,10 +71,3 @@ C-Wildwater/
 ├── codeC/                         # Répertoire contenant le code source C
 └── docs/                          # Répertoire pour la documentation supplémentaire
 ```
-
-
-## Licence
-
-(Si un fichier de licence existe, spécifiez le type de licence ici. Sinon, envisagez d'en ajouter un.)
-
-Ce projet est open source et disponible sous la licence [Nom de la licence]. Voir le fichier `LICENSE` pour plus d'informations (si vous ajoutez un fichier de licence).
