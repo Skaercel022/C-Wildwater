@@ -1,12 +1,10 @@
-# Compilateur et options
 CC = gcc
 CFLAGS = -Wall -Wextra -Iinclude
 
-# Dossiers
 SRC_DIR = src
 OBJ_DIR = obj
 
-# Fichiers sources et objets
+#fichiers sources et objets
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 OBJS = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
@@ -23,7 +21,7 @@ $(TARGET): $(OBJS)
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-#création du dossier obj si nécessaire
+#creation du dossier obj si nécessaire
 $(OBJ_DIR):
 	mkdir -p $(OBJ_DIR)
 

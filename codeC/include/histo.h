@@ -1,5 +1,5 @@
-#ifndef fct_fichier_h
-#define fct_fichier_h
+#ifndef histo_h
+#define histo_h
 
 FILE* ouvrirFichierEcriture(char* nom_fichier);
 void fermerFichier(FILE* fichier);
@@ -19,4 +19,4 @@ void fichier10PlusGrandesCapte(AVL_USINE* racine, const char* nomFichierSortie);
 void fichier50PlusPetitesCapte(AVL_USINE* racine, const char* nomFichierSortie);
 
 
-#endif // fct_fichier_h
+#endif // histo_h

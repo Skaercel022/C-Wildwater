@@ -12,7 +12,8 @@ typedef struct avl_usine {
     float traite;
 }AVL_USINE;
 
-
+int max(int a, int b);
+int min(int a, int b);
 AVL_USINE* rotationDroite(AVL_USINE* pAVL_USINE);
 AVL_USINE* rotationGauche(AVL_USINE* pAVL_USINE);
 AVL_USINE* doubleRotationDroite(AVL_USINE* pAVL_USINE);

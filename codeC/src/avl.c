@@ -1,5 +1,19 @@
 #include "../include/include.h"
 
+int max(int a, int b) {
+    if (a >= b) {
+        return a;
+    }
+    return b;
+}
+
+int min(int a, int b) {
+    if (a <= b) {
+        return a;
+    }
+    return b;
+}
+
 AVL_USINE* creerAVL_USINE(char* carac) {
     AVL_USINE* pAVL_USINE = malloc(sizeof(AVL_USINE));
     if (pAVL_USINE == NULL) {

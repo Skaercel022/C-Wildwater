@@ -1,10 +1,3 @@
-//objectif de cette partie : ouvrir fichier avec les sources et les usines
-//lire les données et modifier l'avl_usine usine
-//creer fichiers avec les 10 plus grandes usines et 50 plus petites usines triées par ordre alphabétique décroissant
-
-//to do list :
-//convertir les milliers de m3 en millions de m3
-
 #include "../include/include.h"
 
 //fonction d'ouverture de fichier
@@ -158,6 +151,37 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
             }
         }
         free(ligne);
+    }
+}
+
+void echangerUsines(AVL_USINE** a, AVL_USINE** b) {
+    AVL_USINE* temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int partitionUsines(AVL_USINE** tab, int bas, int haut) {
+    //dernier element pour pivot
+    char* pivot = tab[haut]->val;
+    int i = bas - 1;
+
+    for (int j = bas; j < haut; j++) {
+        //ordre decorissant
+        if (strcmp(tab[j]->val, pivot) > 0) {
+            i++;
+            echangerUsines(&tab[i], &tab[j]);
+        }
+    }
+
+    echangerUsines(&tab[i + 1], &tab[haut]);
+    return i + 1;
+}
+
+void triRapideUsinesDec(AVL_USINE** tab, int bas, int haut) {
+    if (bas < haut) {
+        int pivot = partitionUsines(tab, bas, haut);
+        triRapideUsinesDec(tab, bas, pivot - 1);
+        triRapideUsinesDec(tab, pivot + 1, haut);
     }
 }
 
@@ -490,7 +514,7 @@ void fichier10PlusGrandesTraite(AVL_USINE* racine, const char* nomFichierSortie)
     fclose(fichierSortie);
 }
 
-
+//fonctions principales
 void creerFichiersVMax(AVL_USINE* racine) {
     fichier50PlusPetitesMax(racine, "vol_max_50_petites.csv");
     fichier10PlusGrandesMax(racine, "vol_max_10_grandes.csv");

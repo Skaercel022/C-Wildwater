@@ -7,8 +7,7 @@
 #include <string.h>
 
 #include "avl_usine.h"
-#include "fonction.h"
 #include "arbre.h"
 #include "leaks.h"
-#include "fct_fichier.h"
+#include "histo.h"
 #endif // INCLUDE_H
