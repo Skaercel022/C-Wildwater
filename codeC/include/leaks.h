@@ -14,7 +14,7 @@ struct liste {
 };
 
 struct arbre_liste {
-    Liste** liste;
+    Liste* liste;
     char id[LONGUEUR_ID];
     int nb_enfant;
     float coefficient_parent;  // pour gestion fuite
@@ -31,7 +31,7 @@ typedef struct avl_fuites{
 
 
 typedef struct {
-    char id_usine[LONGUEUR_ID];
+    char id[LONGUEUR_ID];
     char id_amont[LONGUEUR_ID];
     char id_aval[LONGUEUR_ID];
     double Volume;

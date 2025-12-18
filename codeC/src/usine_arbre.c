@@ -3,13 +3,16 @@
 
 // Création des structures :
 
-LignesCSV creerLigneCSV() {
-    LignesCSV ligne;
-    strcpy(ligne.id_usine, "");
-    strcpy(ligne.id_amont, "");
-    strcpy(ligne.id_aval, "");
-    ligne.Volume = 0.0;
-    ligne.fuite = 0.0;
+LignesCSV* creerLigneCSV() {
+    LignesCSV* ligne=malloc(sizeof(LignesCSV));
+    if(ligne == NULL){
+        return NULL;
+    }
+    strcpy(ligne->id, "");
+    strcpy(ligne->id_amont, "");
+    strcpy(ligne->id_aval, "");
+    ligne->Volume = 0.0;
+    ligne->fuite = 0.0;
     return ligne;
 }
 
@@ -19,9 +22,9 @@ Arbre_liste* constructeurArbre(LignesCSV* ligne){
     Arbre->nb_enfant=0;
     Arbre->coefficient_parent=1.0;
     Arbre->Volume_parent=ligne->Volume;
-    // Copie de l'id_usine
-    Arbre->id_usine=malloc(strlen(ligne->id_usine)+1);
-    strcpy(Arbre->id_usine, ligne->id_usine);
+    // Copie de l'id
+    Arbre->id=malloc(strlen(ligne->id)+1);
+    strcpy(Arbre->id, ligne->id);
     return Arbre;
 }
 
@@ -37,12 +40,12 @@ AVL_FUITES* constructeurAVL(LignesCSV* ligne){
     if (nouveau == NULL){
         exit(1);
     }
-    nouveau->id = malloc(strlen(ligne->id_usine) + 1);
+    nouveau->id = malloc(strlen(ligne->id) + 1);
     if (nouveau->id == NULL){
         free(nouveau);
         exit(1);
     }
-    strcpy(nouveau->id, ligne->id_usine);
+    strcpy(nouveau->id, ligne->id);
     nouveau->fuite = ligne->fuite;
     nouveau->pGauche = NULL;
     nouveau->pDroit = NULL;
@@ -66,60 +69,101 @@ Code_Erreur ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     return Parsing_OK;
 }
 
-Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat){
-    // Sépare la ligne en tokens et remplit le struct LignesCSV
-    // Vérifie si les pointeurs sont valides
-    if (ligne == NULL || resultat == NULL) return Erreur_Format_Token;
+Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat) {
+    // Vérifie si le pointeur du fichier et le résultat sont valides
+    if (fichier == NULL || resultat == NULL) {
+        return Erreur_Pointeur_Nul;
+    }
 
-    // Vérifie si la ligne est vide
-    char* ligne_copy = strdup(ligne); // Crée une copie en allouant directement de la mémoire
+    // Taille initiale du buffer
+    unsigned int capacite = 256;
+    char* buffer = malloc(capacite);
+    if (buffer == NULL) {
+        return Erreur_Allocation;
+    }
+
+    unsigned int position = 0;
+    int c;
+
+    // Lecture caractère par caractère
+    while ((c = fgetc(fichier)) != EOF) {
+        if (position >= capacite - 1) {
+            capacite *= 2;
+            char* tmp = realloc(buffer, capacite);
+            if (tmp == NULL) {
+                free(buffer);
+                return Erreur_Allocation;
+            }
+            buffer = tmp;
+        }
+        if (c == '\n') {
+            break;
+        }
+        buffer[position++] = c;
+    }
+
+    // Si on arrive à EOF sans avoir lu un seul caractère
+    if (position == 0 && c == EOF) {
+        free(buffer);
+        return Erreur_Format_Token;
+    }
+
+    // Terminer la chaîne de caractères
+    buffer[position] = '\0';
+
+    // Parsing de la ligne
+    char* ligne_copy = strdup(buffer);
     if (ligne_copy == NULL) {
+        free(buffer);
         return Erreur_Allocation;
     }
 
     char* token[5];
-    const char delimiteur[]= ";";
+    const char delimiteur[] = ";";
     int colonne_count = 0;
-    // Utilisation de strtok pour diviser la ligne en tokens
-    // strtok modifie la chaîne d'origine, donc on travaille sur une copie
-    token = strtok(ligne_copy, delimiteur);
+    char* token_courant = strtok(ligne_copy, delimiteur);
 
-    while (token!=NULL && colonne_count < 5) {
-        switch (colonne_count) {
-            case 0: // Id usine
-                strncpy(resultat->id_usine, token, LONGUEUR_ID - 1);
-                resultat->id_usine[LONGUEUR_ID - 1] = '\0'; // Assure que la chaîne est terminée par un caractère nul
-                break;
-            case 1:
-                strncpy(resultat->id_amont, token, LONGUEUR_ID - 1);
-                resultat->id_amont[LONGUEUR_ID - 1] = '\0';
-                break;
-            case 2:
-                strncpy(resultat->id_aval, token, LONGUEUR_ID - 1);
-                resultat->id_aval[LONGUEUR_ID - 1] = '\0';
-                break;
-            case 3:
-                resultat->Volume = atof(token); // Conversion en double d'une chaîne de caractères
-                break;
-            case 4:
-                resultat->fuite = atof(token);
-                break;
-            default:
-                free(ligne_copy);
-                return Erreur_NB_colonnes;
-        }
-        token = strtok(NULL, delimiteur);  // Passe au token suivant si possible NULL=> pas de token suivant
+    while (token_courant != NULL && colonne_count < 5) {
+        token[colonne_count] = token_courant;
         colonne_count++;
+        token_courant = strtok(NULL, delimiteur);
     }
 
-    free(ligne_copy);
+    free(buffer);
 
-    if (colonne_count != 5 ) {
+    if (colonne_count != 5) {
+        free(ligne_copy);
         return Erreur_NB_colonnes;
     }
 
+    // Remplissage des champs
+    strcpy(resultat->id, "-");
+    strcpy(resultat->id_amont, "-");
+    strcpy(resultat->id_aval, "-");
+    resultat->Volume = 0.0;
+    resultat->fuite = 0.0;
+
+    strncpy(resultat->id, token[0], LONGUEUR_ID - 1);
+    resultat->id[LONGUEUR_ID - 1] = '\0';
+
+    strncpy(resultat->id_amont, token[1], LONGUEUR_ID - 1);
+    resultat->id_amont[LONGUEUR_ID - 1] = '\0';
+
+    strncpy(resultat->id_aval, token[2], LONGUEUR_ID - 1);
+    resultat->id_aval[LONGUEUR_ID - 1] = '\0';
+
+    if (strcmp(token[3], "-") != 0) {
+        resultat->Volume = atof(token[3]);
+    }
+
+    if (strcmp(token[4], "-") != 0) {
+        resultat->fuite = atof(token[4]);
+    }
+
+    free(ligne_copy);
     return Parsing_OK;
 }
+
 
 AVL_FUITES* RotationDroite(AVL_FUITES* racine){
     AVL_FUITES* nouvelle_racine = racine->pGauche;
@@ -157,7 +201,7 @@ AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine){
 
 
 AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h){
-    int comparaison=strcmp(ligne->id_usine, racine->id);
+    int comparaison=strcmp(ligne->id, racine->id);
     if (racine == NULL){
         *h = 1;
         return constructeurAVL(ligne);
@@ -211,9 +255,9 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h){
     }
 }
 
-Liste* rechercheliste(Liste* liste, Arbre_liste* id){
+Liste* rechercheliste(Liste* liste, Arbre_liste* Id){
     while (liste != NULL){
-        if (strcmp(liste->enfant->id_usine, id->id_usine) == 0){
+        if (strcmp(liste->enfant->id, Id->id) == 0){
             return liste;
         }
         liste = liste->next;
@@ -246,5 +290,6 @@ Liste* creationArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_usines){
     // Recherche de l'arbre de l'usine amont
     Liste* liste_amont=rechercheliste(liste_usines, rechercheArbre(racine, ligne->id_amont));
     if (liste_amont == NULL){
-        // L'usine amont n'existe pas encore dans la liste, on la crée
+        // L'usine amont n'existe pas encore dans la liste, on la créer
+
 }
