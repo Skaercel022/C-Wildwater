@@ -66,7 +66,6 @@ char* lireLigne(FILE* fichier) {
 }
 
 //fonction de lecture du fichier et insertion dans l'avl_usine
-//FONCTION A TESTER
 
 void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
     char* ligne = NULL;
@@ -162,7 +161,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
     }
 }
 
-//fichier avec les 50 plus petites usines en volume max
+//fichiers avec les 50 plus petites usines en volume max
 
 //pour volume max
 void insererTrierPetitesMax(AVL_USINE** tableau, int* compteur, int maxUsines, AVL_USINE* usine) {

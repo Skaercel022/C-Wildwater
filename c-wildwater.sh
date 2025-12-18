@@ -2,6 +2,7 @@
 
 t_initial=$(date +%s%3N)
 
+
 erreur_sortie() {
     echo "Erreur: $1" >&2
     t_final=$(date +%s%3N)
@@ -23,10 +24,19 @@ if [ ! -f "$DATA_FILE" ]; then
     erreur_sortie "Fichier de données introuvable"
 fi
 
-if [ "$MODE" != "histo" && "$MODE" != "leaks" ]; then
+if [[ "$MODE" != "histo" ]] && [[ "$MODE" != "leaks" ]]; then
     erreur_sortie "Mode invalide (attendu: histo ou leaks)"
 fi
 
+if [[ "$MODE" = "histo" ]]; then
+    case "$TYPE" in
+    max|src|real)
+        ;;
+    *)
+        erreur_sortie "Type histogramme invalide (max | src | real)"
+        ;;
+    esac
+fi
 
 if [ ! -d "codeC" ]; then
     erreur_sortie "Dossier codeC introuvable"
@@ -44,24 +54,7 @@ cd - > /dev/null || erreur_sortie "Erreur retour dossier"
 TMP_FILE="/tmp/cwildwater_filtered_$$.csv"
 
 
-{
-    grep -E "^-;[^-;]+;-;" "$DATA_FILE"
-    grep -E "^-;[^;]*;[^-;]*;[^-;]*;[^;]*" "$DATA_FILE"
-} > "$TMP_FILE"
-
-if [ ! -s "$TMP_FILE" ]; then
-    erreur_sortie "Aucune donnée valide après filtrage"
-fi
-
 if [ "$MODE" = "histo" ]; then
-    case "$TYPE" in
-    max|src|real)
-        ;;
-    *)
-        erreur_sortie "Type histogramme invalide (max | src | real)"
-        ;;
-    esac
-
     {
     grep -E "^-;[^-;]+;-;" "$DATA_FILE"
     grep -E "^-;[^;]*;[^-;]*;[^-;]*;[^;]*" "$DATA_FILE"
