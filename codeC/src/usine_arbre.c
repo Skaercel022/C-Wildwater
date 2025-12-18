@@ -340,8 +340,8 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
             // Appel récursif pour les enfants
             total_fuites += calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_enfant);
         }
+        liste = liste->next;
     }
-
     return total_fuites;
 }
 
@@ -355,6 +355,8 @@ double calcule_fuites(const char* nom_fichier, const char* id){
     }
     AVL_FUITES* racine = NULL;
     Liste* liste_arbres = NULL;
+    double volume_depart = 0.0;
+    int *h = 0;
 
     LignesCSV* ligne = creerLigneCSV();
     if (ligne == NULL) {
@@ -362,6 +364,19 @@ double calcule_fuites(const char* nom_fichier, const char* id){
         return -1.0;
     }
     while(lireEtParserLigne(fichier, ligne) == Parsing_OK){
+        h = 0;
+        racine = InsertionAVL(racine, ligne, &h);
+        Arbre_liste* arbre = rechercheArbre(racine, ligne->id);
+        if (arbre != NULL){
+            // Mise à jour des informations de l'arbre
+            arbre->Volume_parent = ligne->Volume;
+            arbre->coefficient_parent = ligne->fuite;
+
+            if (strcmp(ligne->id_amont, id) == 0) {
+                volume_depart = ligne->Volume; // Usine principale
+            }
+        }
+
         AVL_FUITES* NoeudAVL = InsertionAVL(racine, ligne, NULL);
         if (NoeudAVL == NULL) {
             free(ligne);
