@@ -17,7 +17,7 @@ void fermerFichier(FILE* fichier){
     }
 }
 
-int estVide(const char *s) {
+int estVide(char *s) {
     return (s == NULL || strcmp(s, "-") == 0);
 }
 
@@ -222,7 +222,7 @@ void parcoursInfixeInsertionPetitesMax(AVL_USINE* noeud, AVL_USINE** tableauUsin
     parcoursInfixeInsertionPetitesMax(noeud->pDroit, tableauUsines, compteur);
 }
 
-void fichier50PlusPetitesMax(AVL_USINE* racine, const char* nomFichierSortie) {
+void fichier50PlusPetitesMax(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
@@ -278,7 +278,7 @@ void parcoursInfixeInsertionPetitesCapte(AVL_USINE* noeud, AVL_USINE** tableauUs
     parcoursInfixeInsertionPetitesCapte(noeud->pDroit, tableauUsines, compteur);
 }
 
-void fichier50PlusPetitesCapte(AVL_USINE* racine, const char* nomFichierSortie) {
+void fichier50PlusPetitesCapte(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
@@ -331,7 +331,7 @@ void parcoursInfixeInsertionPetitesTraite(AVL_USINE* noeud, AVL_USINE** tableauU
     parcoursInfixeInsertionPetitesTraite(noeud->pDroit, tableauUsines, compteur);
 }
 
-void fichier50PlusPetitesTraite(AVL_USINE* racine, const char* nomFichierSortie) {
+void fichier50PlusPetitesTraite(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
@@ -387,7 +387,7 @@ void parcoursInfixeInsertionGrandesMax(AVL_USINE* noeud, AVL_USINE** tableauUsin
     parcoursInfixeInsertionGrandesMax(noeud->pDroit, tableauUsines, compteur);
 }
 
-void fichier10PlusGrandesMax(AVL_USINE* racine, const char* nomFichierSortie) {
+void fichier10PlusGrandesMax(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
         exit(53);
@@ -440,7 +440,7 @@ void parcoursInfixeInsertionGrandesCapte(AVL_USINE* noeud, AVL_USINE** tableauUs
     parcoursInfixeInsertionGrandesCapte(noeud->pDroit, tableauUsines, compteur);
 }
 
-void fichier10PlusGrandesCapte(AVL_USINE* racine, const char* nomFichierSortie) {
+void fichier10PlusGrandesCapte(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
         exit(53);
@@ -493,7 +493,7 @@ void parcoursInfixeInsertionGrandesTraite(AVL_USINE* noeud, AVL_USINE** tableauU
     parcoursInfixeInsertionGrandesTraite(noeud->pDroit, tableauUsines, compteur);
 }
 
-void fichier10PlusGrandesTraite(AVL_USINE* racine, const char* nomFichierSortie) {
+void fichier10PlusGrandesTraite(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
         exit(53);
