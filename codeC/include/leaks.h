@@ -9,16 +9,15 @@ typedef struct arbre_liste Arbre_liste;
 
 // Définition des structures
 struct liste {
-    void* ptr;            // ok
-    char* id;
     Liste* next;
     Arbre_liste* enfant;  // pointeur vers un Arbre_liste
 };
 
 struct arbre_liste {
     Liste* liste;
-    int nb_fuite;
-    float coefficient;  // pour gestion fuite
+    int nb_enfant;
+    float coefficient_parent;  // pour gestion fuite
+    double Volume_parent;
 };
 
 typedef struct avl_fuites{
@@ -45,6 +44,7 @@ typedef enum {
     Erreur_Format_Token,
     Erreur_Champ_Vide,
     Erreur_NB_colonnes,
+    Erreur_Pointeur_Nul,
 }Code_Erreur;
 
 

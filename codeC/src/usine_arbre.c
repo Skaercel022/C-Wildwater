@@ -1,6 +1,7 @@
 #include "../include/include.h"
 
 
+// Création des structures :
 
 LignesCSV creerLigneCSV() {
     LignesCSV ligne;
@@ -10,6 +11,22 @@ LignesCSV creerLigneCSV() {
     ligne.Volume = 0.0;
     ligne.fuite = 0.0;
     return ligne;
+}
+
+Arbre_liste* constructeurArbre(LignesCSV* ligne){
+    Arbre_liste* Arbre=malloc(sizeof(Arbre_liste));
+    Arbre->liste=NULL;
+    Arbre->nb_enfant=0;
+    Arbre->coefficient_parent=1.0;
+    Arbre->Volume_parent=ligne->Volume;
+    return Arbre;
+}
+
+Liste* constructeurListe(Arbre_liste* enfant){
+    Liste* nouveau=malloc(sizeof(Liste));
+    nouveau->next=NULL;
+    nouveau->enfant=enfant;
+    return nouveau;
 }
 
 AVL_FUITES* constructeurAVL(LignesCSV* ligne){
@@ -31,6 +48,20 @@ AVL_FUITES* constructeurAVL(LignesCSV* ligne){
     return nouveau;
 }
 
+
+Code_Erreur ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
+    if (parent == NULL || enfant == NULL) {
+        return Erreur_Pointeur_Nul;
+    }
+    Liste* nouveau=constructeurListe(enfant);
+    if (nouveau == NULL){
+        return Erreur_Allocation;
+    }
+    nouveau->next=parent->liste;
+    parent->liste=nouveau;
+    parent->nb_enfant+=1;
+    return Parsing_OK;
+}
 
 Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat){
     // Sépare la ligne en tokens et remplit le struct LignesCSV
