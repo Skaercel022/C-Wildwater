@@ -53,7 +53,7 @@ AVL_FUITES* constructeurAVL(LignesCSV* ligne){
     nouveau->ptr = NULL;
     return nouveau;
 }
-
+// Fin création des structures
 
 Code_Erreur ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     if (parent == NULL || enfant == NULL) {
@@ -63,7 +63,7 @@ Code_Erreur ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     if (nouveau == NULL){
         return Erreur_Allocation;
     }
-    nouveau->next=parent->liste;
+    nouveau->next=parent->liste; // Insertion en tête de liste
     parent->liste=nouveau;
     parent->nb_enfant+=1;
     return Parsing_OK;
@@ -164,7 +164,7 @@ Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat) {
     return Parsing_OK;
 }
 
-
+// Fonctions pour l'AVL
 AVL_FUITES* RotationDroite(AVL_FUITES* racine){
     AVL_FUITES* nouvelle_racine = racine->pGauche;
     racine->pGauche = nouvelle_racine->pDroit;
@@ -255,6 +255,9 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h){
     }
 }
 
+// Fin de fonctions AVL
+
+
 Liste* rechercheliste(Liste* liste, Arbre_liste* Id){
     while (liste != NULL){
         if (strcmp(liste->enfant->id, Id->id) == 0){
@@ -273,17 +276,17 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
         return racine->ptr;
     }
     else if (strcmp(id, racine->id) < 0){
-        return recherche(racine->pGauche, id);
+        return rechercheArbre(racine->pGauche, id);
     }
     else if(strcmp(id, racine->id) > 0){
-        return recherche(racine->pDroit, id);
+        return rechercheArbre(racine->pDroit, id);
     }
     else{
         return NULL;
     }
 }
 
-Liste* creationArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_usines){
+Liste* creationNoeudArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_usines){
     if(racine == NULL || ligne == NULL){
         return liste_usines;
     }
@@ -291,5 +294,7 @@ Liste* creationArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_usines){
     Liste* liste_amont=rechercheliste(liste_usines, rechercheArbre(racine, ligne->id_amont));
     if (liste_amont == NULL){
         // L'usine amont n'existe pas encore dans la liste, on la créer
-
+    }
+    
+    return NULL;
 }

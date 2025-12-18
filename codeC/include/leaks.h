@@ -15,16 +15,17 @@ struct liste {
 
 struct arbre_liste {
     Liste* liste;
-    char id[LONGUEUR_ID];
+    char* id;
     int nb_enfant;
     float coefficient_parent;  // pour gestion fuite
     double Volume_parent;
 };
 
 typedef struct avl_fuites{
-    char id[LONGUEUR_ID];
+    char* id;
     struct avl_fuites* pGauche;
     struct avl_fuites* pDroit;
+    double fuite;
     int equilibre;
     Arbre_liste* ptr; // pointeurs vers l'arbre de fuites
 }AVL_FUITES;
@@ -47,10 +48,12 @@ typedef enum {
     Erreur_Pointeur_Nul,
 }Code_Erreur;
 
-
-Code_Erreur SegmentationLigneCSV(const char* ligne, LignesCSV* resultat);
+LignesCSV* creerLigneCSV();
+Arbre_liste* constructeurArbre(LignesCSV* ligne);
+Liste* constructeurListe(Arbre_liste* enfant);
+AVL_FUITES* constructeurAVL(LignesCSV* ligne);
+Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat);
 AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h);
-LignesCSV creerLigneCSV();
 AVL_FUITES* constructeurAVL(LignesCSV* ligne);
 Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id);
 
