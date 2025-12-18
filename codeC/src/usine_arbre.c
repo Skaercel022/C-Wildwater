@@ -292,6 +292,7 @@ Liste* creationNoeudArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_arb
     if(racine == NULL || ligne == NULL){
         return liste_arbres;
     }
+    Arbre_liste* arbre_amont=rechercheArbre(racine, ligne->id_amont);
     if(arbre_amont == NULL){
         return liste_arbres;
     }
@@ -333,11 +334,11 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     // Parcourir la liste des enfants
     Liste* liste = noeud->liste;
     while (liste != NULL) {
-        if(liste-enfant !=NULL){
+        if(liste->enfant !=NULL){
             double fuite_enfant = volume_par_enfant * (liste->enfant->coefficient_parent /100.0);
             total_fuites += fuite_enfant;
             // Appel récursif pour les enfants
-            total_fuites += calculer_fuites_rec(liste->enfant, volume_par_enfant)
+            total_fuites += calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_enfant);
         }
     }
 
@@ -388,5 +389,6 @@ double calcule_fuites(const char* nom_fichier, const char* id){
     Arbre_liste* arbre_cible = rechercheArbre(racine, (char*) id); // on passe d'un const char a un char*
     if (arbre_cible == NULL) {
 
-
+    }
+    return 0.0;
 }
