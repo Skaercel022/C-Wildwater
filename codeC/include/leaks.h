@@ -23,11 +23,12 @@ struct arbre_liste {
 
 typedef struct avl_fuites{
     char* id;
-    struct avl_fuites* pGauche;
-    struct avl_fuites* pDroit;
     double fuite;
     int equilibre;
     Arbre_liste* ptr; // pointeurs vers l'arbre de fuites
+    struct avl_fuites* pGauche;
+    struct avl_fuites* pDroit;
+   
 }AVL_FUITES;
 
 

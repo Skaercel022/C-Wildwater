@@ -1,5 +1,7 @@
 #include "../include/include.h"
 
+// faire le coeffficient de fuites
+
 
 // Création des structures :
 
@@ -258,10 +260,10 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h){
 // Fin de fonctions AVL
 
 
-Liste* rechercheliste(Liste* liste, Arbre_liste* Id){
+Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id){
     while (liste != NULL){
         if (strcmp(liste->enfant->id, Id->id) == 0){
-            return liste;
+            return liste->enfant;
         }
         liste = liste->next;
     }
@@ -286,15 +288,20 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
     }
 }
 
-Liste* creationNoeudArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_usines){
+Liste* creationNoeudArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_arbres){
     if(racine == NULL || ligne == NULL){
-        return liste_usines;
+        return liste_arbres;
     }
     // Recherche de l'arbre de l'usine amont
-    Liste* liste_amont=rechercheliste(liste_usines, rechercheArbre(racine, ligne->id_amont));
-    if (liste_amont == NULL){
-        // L'usine amont n'existe pas encore dans la liste, on la créer
+    Arbre_liste* liste_amont=rechercheliste(liste_arbres, rechercheArbre(racine, ligne->id_amont)); // jesuis sur le Noeud parent
+    Arbre_liste* nouvel_arbre=constructeurArbre(ligne); // je crée le noeud enfant
+    if(liste_amont!=NULL){
+        ajouter_enfant(liste_amont, nouvel_arbre);
+        return liste_arbres;
     }
-    
+    else{
+        free(nouvel_arbre);
+        return liste_arbres;
+    }
     return NULL;
 }
