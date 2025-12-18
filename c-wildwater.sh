@@ -1,11 +1,11 @@
 #!/bin/bash
 
-start_time=$(date +%s%3N)
+t_initial=$(date +%s%3N)
 
 erreur_sortie() {
     echo "Erreur: $1" >&2
-    end_time=$(date +%s%3N)
-    echo "Durée totale: $((end_time - start_time)) ms"
+    t_final=$(date +%s%3N)
+    echo "Durée totale: $((t_final - t_initial)) ms"
     exit 1
 }
 
@@ -23,19 +23,11 @@ if [ ! -f "$DATA_FILE" ]; then
     erreur_sortie "Fichier de données introuvable"
 fi
 
-if [ "$MODE" != "histo" ]; then
-    erreur_sortie "Mode invalide (attendu: histo)"
+if [ "$MODE" != "histo" && "$MODE" != "leaks" ]; then
+    erreur_sortie "Mode invalide (attendu: histo ou leaks)"
 fi
 
-case "$TYPE" in
-    max|src|real)
-        ;;
-    *)
-        erreur_sortie "Type histogramme invalide (max | src | real)"
-        ;;
-esac
 
-#compilation
 if [ ! -d "codeC" ]; then
     erreur_sortie "Dossier codeC introuvable"
 fi
@@ -49,7 +41,6 @@ fi
 
 cd - > /dev/null || erreur_sortie "Erreur retour dossier"
 
-#filtrage données avec grep
 TMP_FILE="/tmp/cwildwater_filtered_$$.csv"
 
 
@@ -62,95 +53,139 @@ if [ ! -s "$TMP_FILE" ]; then
     erreur_sortie "Aucune donnée valide après filtrage"
 fi
 
-#execution programme
-./codeC/run histo "$TYPE" "$TMP_FILE"
-RET=$?
+if [ "$MODE" = "histo" ]; then
+    case "$TYPE" in
+    max|src|real)
+        ;;
+    *)
+        erreur_sortie "Type histogramme invalide (max | src | real)"
+        ;;
+    esac
 
-rm -f "$TMP_FILE"
+    {
+    grep -E "^-;[^-;]+;-;" "$DATA_FILE"
+    grep -E "^-;[^;]*;[^-;]*;[^-;]*;[^;]*" "$DATA_FILE"
+    } > "$TMP_FILE"
 
-if [ "$RET" -ne 0 ]; then
+    if [ ! -s "$TMP_FILE" ]; then
+        erreur_sortie "Aucune donnée valide après filtrage"
+    fi
+
+    ./codeC/run histo "$TYPE" "$TMP_FILE"
+    RET=$?
+
+    rm -f "$TMP_FILE"
+
+    if [ "$RET" -ne 0 ]; then
+        cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
+        make clean > /dev/null 2>&1
+        cd - > /dev/null || true
+        erreur_sortie "Le programme C a retourné une erreur"
+    fi
+
     cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
     make clean > /dev/null 2>&1
     cd - > /dev/null || true
-    erreur_sortie "Le programme C a retourné une erreur"
+
+    case "$TYPE" in
+        max)
+            FILE_50PETITES="vol_max_50_petites.csv"
+            FILE_10GRANDES="vol_max_10_grandes.csv"
+            COL=2
+            TITRE="Capacité maximale de traitement"
+            ;;
+        src)
+            FILE_50PETITES="vol_capte_50_petites.csv"
+            FILE_10GRANDES="vol_capte_10_grandes.csv"
+            COL=3
+            TITRE="Volume total capté"
+            ;;
+        real)
+            FILE_50PETITES="vol_traite_50_petites.csv"
+            FILE_10GRANDES="vol_traite_10_grandes.csv"
+            COL=4
+            TITRE="Volume réellement traité"
+            ;;
+    esac
+
+    gnuplot << EOF
+    set terminal pngcairo size 1600,800
+    set output "${FILE_50PETITES%.csv}.png"
+
+    set datafile separator ";"
+
+    set style fill solid 1.0
+    set style line 1 lc rgb "#1f77b4"
+    set boxwidth 0.9
+
+    set yrange [0:*]
+    set grid ytics
+    set key off
+
+    set title "${TITRE} – 50 plus petites usines"
+    set xlabel "Usines"
+    set ylabel "Volume (M.m³ / an)"
+
+    set xtics rotate by -45 font ",8"
+
+    plot "${FILE_50PETITES}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
+        with boxes ls 1
+EOF
+
+    gnuplot << EOF
+    set terminal pngcairo size 1400,800
+    set output "${FILE_10GRANDES%.csv}.png"
+
+    set datafile separator ";"
+
+    set style fill solid 1.0
+    set style line 1 lc rgb "#1f77b4"
+    set boxwidth 0.9
+
+    set yrange [0:*]
+    set grid ytics
+    set key off
+
+    set title "${TITRE} – 10 plus grandes usines"
+    set xlabel "Usines"
+    set ylabel "Volume (M.m³ / an)"
+
+    set xtics rotate by -30 font ",10"
+
+    plot "${FILE_10GRANDES}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
+        with boxes ls 1
+EOF
 fi
 
-cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
-make clean > /dev/null 2>&1
-cd - > /dev/null || true
+if [ "$MODE" = "leaks" ]; then
+    awk -F';' -v type="$TYPE" '$1 == type || $2 == type' "$DATA_FILE" > "$TMP_FILE"
+    
+    if [ ! -s "$TMP_FILE" ]; then
+        erreur_sortie "L'usine avec l'ID spécifiée n'a pas été trouvée"
+    fi
 
-case "$TYPE" in
-    max)
-        FILE_SMALL="vol_max_50_petites.csv"
-        FILE_BIG="vol_max_10_grandes.csv"
-        COL=2
-        TITLE="Capacité maximale de traitement"
-        ;;
-    src)
-        FILE_SMALL="vol_capte_50_petites.csv"
-        FILE_BIG="vol_capte_10_grandes.csv"
-        COL=3
-        TITLE="Volume total capté"
-        ;;
-    real)
-        FILE_SMALL="vol_traite_50_petites.csv"
-        FILE_BIG="vol_traite_10_grandes.csv"
-        COL=4
-        TITLE="Volume réellement traité"
-        ;;
-esac
+    ./codeC/run leaks "$TYPE" "$TMP_FILE"
+    RET=$?
 
-gnuplot << EOF
-set terminal pngcairo size 1600,800
-set output "${FILE_SMALL%.csv}.png"
+    rm -f "$TMP_FILE"
 
-set datafile separator ";"
+    if [ "$RET" -ne 0 ]; then
+        cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
+        make clean > /dev/null 2>&1
+        cd - > /dev/null || true
+        erreur_sortie "Le programme C a retourné une erreur"
+    fi
 
-set style fill solid 1.0
-set style line 1 lc rgb "#1f77b4"
-set boxwidth 0.9
+    cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
+    make clean > /dev/null 2>&1
+    cd - > /dev/null || true
 
-set yrange [0:*]
-set grid ytics
-set key off
 
-set title "${TITLE} – 50 plus petites usines"
-set xlabel "Usines"
-set ylabel "Volume (M.m³ / an)"
-
-set xtics rotate by -45 font ",8"
-
-plot "${FILE_SMALL}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
-     with boxes ls 1
-EOF
-
-gnuplot << EOF
-set terminal pngcairo size 1400,800
-set output "${FILE_BIG%.csv}.png"
-
-set datafile separator ";"
-
-set style fill solid 1.0
-set style line 1 lc rgb "#1f77b4"
-set boxwidth 0.9
-
-set yrange [0:*]
-set grid ytics
-set key off
-
-set title "${TITLE} – 10 plus grandes usines"
-set xlabel "Usines"
-set ylabel "Volume (M.m³ / an)"
-
-set xtics rotate by -30 font ",10"
-
-plot "${FILE_BIG}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
-     with boxes ls 1
-EOF
+fi
 
 #fin
-end_time=$(date +%s%3N)
+t_final=$(date +%s%3N)
 echo "Traitement terminé avec succès"
-echo "Durée totale: $((end_time - start_time)) ms"
+echo "Durée totale: $((t_final - t_initial)) ms"
 
 exit 0
