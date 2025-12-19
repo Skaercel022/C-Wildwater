@@ -1,7 +1,6 @@
 #include "../include/include.h"
 
-// faire le coeffficient de fuites
-// Vérifier la fonction InsertionAVL
+
 
 // Création des structures :
 
@@ -10,7 +9,6 @@ LignesCSV* creerLigneCSV() {
     if(ligne == NULL){
         return NULL;
     }
-    strcpy(ligne->id, "");
     strcpy(ligne->id_amont, "");
     strcpy(ligne->id_aval, "");
     ligne->Volume = 0.0;
@@ -22,11 +20,11 @@ Arbre_liste* constructeurArbre(LignesCSV* ligne){
     Arbre_liste* Arbre=malloc(sizeof(Arbre_liste));
     Arbre->liste=NULL;
     Arbre->nb_enfant=0;
-    Arbre->coefficient_parent=1.0;
+    Arbre->coefficient_fuite=1.0;
     Arbre->Volume_parent=ligne->Volume;
     // Copie de l'id
-    Arbre->id=malloc(strlen(ligne->id)+1);
-    strcpy(Arbre->id, ligne->id);
+    Arbre->id=malloc(strlen(ligne->id_aval)+1);
+    strcpy(Arbre->id, ligne->id_aval);
     return Arbre;
 }
 
@@ -37,132 +35,69 @@ Liste* constructeurListe(Arbre_liste* enfant){
     return nouveau;
 }
 
-AVL_FUITES* constructeurAVL(LignesCSV* ligne){
+AVL_FUITES* constructeurAVL(Arbre_liste* Noeud){
     AVL_FUITES* nouveau = malloc(sizeof(AVL_FUITES));
     if (nouveau == NULL){
         exit(1);
     }
-    nouveau->id = malloc(strlen(ligne->id) + 1);
-    if (nouveau->id == NULL){
-        free(nouveau);
-        exit(1);
-    }
-    strcpy(nouveau->id, ligne->id);
-    nouveau->fuite = ligne->fuite;
+    nouveau->id = Noeud->id;
     nouveau->pGauche = NULL;
     nouveau->pDroit = NULL;
     nouveau->equilibre = 0;
-    nouveau->ptr = NULL;
+    nouveau->ptr = Noeud;
     return nouveau;
 }
 // Fin création des structures
 
-Code_Erreur ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
+void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     if (parent == NULL || enfant == NULL) {
-        return Erreur_Pointeur_Nul;
+        exit(200);
     }
     Liste* nouveau=constructeurListe(enfant);
     if (nouveau == NULL){
-        return Erreur_Allocation;
+      exit(200);
     }
-    nouveau->next=parent->liste; // Insertion en tête de liste
+    // Empiler :
+    nouveau->next=parent->liste;
     parent->liste=nouveau;
     parent->nb_enfant+=1;
-    return Parsing_OK;
 }
 
 Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat) {
-    // Vérifie si le pointeur du fichier et le résultat sont valides
     if (fichier == NULL || resultat == NULL) {
         return Erreur_Pointeur_Nul;
     }
-
-    // Taille initiale du buffer
-    unsigned int capacite = 256;
-    char* buffer = malloc(capacite);
-    if (buffer == NULL) {
-        return Erreur_Allocation;
-    }
-
-    unsigned int position = 0;
-    int c;
-
-    // Lecture caractère par caractère
-    while ((c = fgetc(fichier)) != EOF) {
-        if (position >= capacite - 1) {
-            capacite *= 2;
-            char* tmp = realloc(buffer, capacite);
-            if (tmp == NULL) {
-                free(buffer);
-                return Erreur_Allocation;
-            }
-            buffer = tmp;
-        }
-        if (c == '\n') {
-            break;
-        }
-        buffer[position++] = c;
-    }
-
-    // Si on arrive à EOF sans avoir lu un seul caractère
-    if (position == 0 && c == EOF) {
-        free(buffer);
+    // Buffer pour lire la ligne
+    char buffer[1024];
+    if (fgets(buffer, sizeof(buffer), fichier) == NULL) {
         return Erreur_Format_Token;
     }
-
-    // Terminer la chaîne de caractères
-    buffer[position] = '\0';
-
-    // Parsing de la ligne
+    // Supprimer le '\n' final si présent
+    buffer[strcspn(buffer, "\n")] = '\0';
+    // Parsing
+    char* token[4];
+    const char delimiteur[] = ";";
     char* ligne_copy = strdup(buffer);
     if (ligne_copy == NULL) {
-        free(buffer);
         return Erreur_Allocation;
     }
-
-    char* token[5];
-    const char delimiteur[] = ";";
     int colonne_count = 0;
     char* token_courant = strtok(ligne_copy, delimiteur);
-
-    while (token_courant != NULL && colonne_count < 5) {
-        token[colonne_count] = token_courant;
-        colonne_count++;
+    while (token_courant != NULL && colonne_count < 4) {
+        token[colonne_count++] = token_courant;
         token_courant = strtok(NULL, delimiteur);
     }
-
-    free(buffer);
-
-    if (colonne_count != 5) {
-        free(ligne_copy);
+    free(ligne_copy);
+    if (colonne_count != 4) {
         return Erreur_NB_colonnes;
     }
-
-    // Remplissage des champs
-    strcpy(resultat->id, "-");
-    strcpy(resultat->id_amont, "-");
-    strcpy(resultat->id_aval, "-");
-    resultat->Volume = 0.0;
-    resultat->fuite = 0.0;
-
-    strncpy(resultat->id, token[0], LONGUEUR_ID - 1);
-    resultat->id[LONGUEUR_ID - 1] = '\0';
-
-    strncpy(resultat->id_amont, token[1], LONGUEUR_ID - 1);
+    // Remplir les champs
+    strncpy(resultat->id_amont, token[0], LONGUEUR_ID - 1);
     resultat->id_amont[LONGUEUR_ID - 1] = '\0';
-
-    strncpy(resultat->id_aval, token[2], LONGUEUR_ID - 1);
+    strncpy(resultat->id_aval, token[1], LONGUEUR_ID - 1);
     resultat->id_aval[LONGUEUR_ID - 1] = '\0';
-
-    if (strcmp(token[3], "-") != 0) {
-        resultat->Volume = atof(token[3]);
-    }
-
-    if (strcmp(token[4], "-") != 0) {
-        resultat->fuite = atof(token[4]);
-    }
-
-    free(ligne_copy);
+    resultat->Volume = atof(token[2]);
+    resultat->fuite = atof(token[3]);
     return Parsing_OK;
 }
 
@@ -202,20 +137,21 @@ AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine){
 }
 
 
-AVL_FUITES* InsertionAVL(AVL_FUITES* racine, LignesCSV* ligne, int* h){
-    int comparaison=strcmp(ligne->id, racine->id);
+AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h){
+    
     if (racine == NULL){
         *h = 1;
-        return constructeurAVL(ligne);
+        return constructeurAVL(Noeud);
     }
+    int comparaison=strcmp(Noeud->id, racine->id);
     if (comparaison < 0){
-        racine->pGauche = InsertionAVL(racine->pGauche, ligne, h);
+        racine->pGauche = InsertionAVL(racine->pGauche, Noeud, h);
         if(*h!=0){
             racine->equilibre--;
         }
     }
     else if (comparaison > 0){
-        racine->pDroit = InsertionAVL(racine->pDroit, ligne, h);
+        racine->pDroit = InsertionAVL(racine->pDroit, Noeud, h);
         if(*h!=0){
             racine->equilibre++;
         }
@@ -270,8 +206,8 @@ Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id){
     return NULL;
 }
 
-Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
-    if (racine == NULL){
+Arbre_liste* rechercheArbre(AVL_FUITES* racine, const char* id){
+    if (racine == NULL || id == NULL){
         return NULL;
     }
     if (strcmp(id, racine->id) == 0){
@@ -288,122 +224,124 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
     }
 }
 
-Liste* creationNoeudArbre(AVL_FUITES* racine, LignesCSV* ligne, Liste* liste_arbres){
-    if(racine == NULL || ligne == NULL){
-        return liste_arbres;
-    }
-    Arbre_liste* arbre_amont=rechercheArbre(racine, ligne->id_amont);
-    if(arbre_amont == NULL){
-        return liste_arbres;
-    }
-    Arbre_liste* parent=rechercheArbre(racine, ligne->id_amont); // je récupère le noeud parent
-    Arbre_liste* nouvel_arbre=constructeurArbre(ligne); // je crée le noeud enfant
-    if (nouvel_arbre == NULL){
-        return liste_arbres;
-    }
-    if(parent!=NULL){
-        Code_Erreur erreur=ajouter_enfant(parent, nouvel_arbre);
-        // Petite Verification d'erreur
-        if(erreur != Parsing_OK){
-            free(nouvel_arbre);
-            return liste_arbres;
+// ajout d'un volume depuis une source
+void ajouterVolumeArbre(LignesCSV* ligne, Arbre_liste* racine){
+        double fuite = (ligne->fuite/100.0)*ligne->Volume;
+        racine->Volume_parent+=fuite;
+        racine->coefficient_fuite=0;
+}
+
+
+
+
+void ajouterNoeudArbre(AVL_FUITES** racine_AVL, LignesCSV* ligne, Arbre_liste** racine_physique) {
+    if (ligne == NULL) exit(200);
+    int h = 0;
+
+    // Premier nœud du réseau (Source)
+    if (*racine_AVL == NULL) {
+        Arbre_liste* nouveau = constructeurArbre(ligne);
+        *racine_AVL = InsertionAVL(*racine_AVL, nouveau, &h);
+        
+        // On sauvegarde ce premier nœud comme racine de l'arbre physique
+        if (*racine_physique == NULL) {
+            *racine_physique = nouveau;
         }
-        return liste_arbres;
-    }
-    else{
-        Liste* nouveau_noeud = constructeurListe(nouvel_arbre); // usine principale donc pas de parent dans le fichier
-        if (nouveau_noeud == NULL) {
-            free(nouvel_arbre);
-            return liste_arbres;
+
+        if (ligne->Volume > 0.0) {
+            ajouterVolumeArbre(ligne, nouveau);
         }
-        nouveau_noeud->next = liste_arbres;
-        liste_arbres = nouveau_noeud;
+    } 
+    else {
+        Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, ligne->id_amont);
+        
+        Arbre_liste* Noeud_aval = constructeurArbre(ligne);
+
+        // Liaison parent-enfant dans l'arbre physique
+        if (Noeud_amont != NULL) {
+            ajouter_enfant(Noeud_amont, Noeud_aval);
+        }
+
+        if (ligne->Volume > 0.0) {
+            ajouterVolumeArbre(ligne, Noeud_aval);
+        }
+        *racine_AVL = InsertionAVL(*racine_AVL, Noeud_aval, &h);
     }
-    return NULL;
 }
 
 // Calcule des fuites totales
 
 double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
-    if (noeud == NULL || volume_entrant <= 0.0 || noeud->nb_enfant == 0) {
+    if (noeud == NULL || volume_entrant <= 0.0) {
         return 0.0;
     }
-
     double total_fuites = 0.0;
-    double volume_par_enfant = volume_entrant / noeud->nb_enfant;
-    // Parcourir la liste des enfants
+
+    // compter le nombre d'enfants
+    int nb_enfant =  0;
+    Liste *tmp = noeud->liste;
+    while (tmp != NULL) {
+        nb_enfant++;
+        tmp = tmp->next;
+    }
+    if (nb_enfant == 0) {
+        return 0.0; // Pas d'enfants, pas de fuites
+    }
     Liste* liste = noeud->liste;
     while (liste != NULL) {
-        if(liste->enfant !=NULL){
-            double fuite_enfant = volume_par_enfant * (liste->enfant->coefficient_parent /100.0);
-            total_fuites += fuite_enfant;
-            // Appel récursif pour les enfants
-            total_fuites += calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_enfant);
-        }
+        // Calcul des fuites locales
+        double fuite_vers_enfant = volume_entrant * (liste->enfant->coefficient_fuite / 100.0);
+        // Volume restant après fuite
+        double volume_arrivant = (volume_entrant - fuite_vers_enfant)/ nb_enfant;
+        // Appel récursif
+        total_fuites += fuite_vers_enfant + calculer_fuites_rec(liste->enfant, volume_arrivant);
         liste = liste->next;
     }
     return total_fuites;
 }
 
-
-
-double calcule_fuites(const char* nom_fichier, const char* id){
-    FILE* fichier = fopen(nom_fichier, "r");
-    if (fichier == NULL) {
-        perror("Erreur lors de l'ouverture du fichier");
-        return -1.0;
+double calculer_fuites(AVL_FUITES* racine_AVL, const char* id_usine) {
+    if (racine_AVL == NULL || id_usine == NULL) {
+        exit(210);
     }
-    AVL_FUITES* racine = NULL;
-    Liste* liste_arbres = NULL;
-    double volume_depart = 0.0;
-    int *h = 0;
-
-    LignesCSV* ligne = creerLigneCSV();
-    if (ligne == NULL) {
-        fclose(fichier);
-        return -1.0;
+    // Rechercher le noeud de l'usine
+    Arbre_liste* noeud_usine = rechercheArbre(racine_AVL, id_usine);
+    if (noeud_usine == NULL) {
+        exit(210);
     }
-    while(lireEtParserLigne(fichier, ligne) == Parsing_OK){
-        h = 0;
-        racine = InsertionAVL(racine, ligne, &h);
-        Arbre_liste* arbre = rechercheArbre(racine, ligne->id);
-        if (arbre != NULL){
-            // Mise à jour des informations de l'arbre
-            arbre->Volume_parent = ligne->Volume;
-            arbre->coefficient_parent = ligne->fuite;
+    // Calculer les fuites totales
+    return calculer_fuites_rec(noeud_usine, noeud_usine->Volume_parent);
+}
 
-            if (strcmp(ligne->id_amont, id) == 0) {
-                volume_depart = ligne->Volume; // Usine principale
-            }
-        }
+void liberer_arbre_physique(Arbre_liste* noeud) {
+    if (noeud == NULL) return;
 
-        AVL_FUITES* NoeudAVL = InsertionAVL(racine, ligne, NULL);
-        if (NoeudAVL == NULL) {
-            free(ligne);
-            fclose(fichier);
-            return -1.0;
-        }
-        racine = NoeudAVL; // mise à jour de la racine de l'AVL apres une potentielle rotation
-        Arbre_liste* arbre = constructeurArbre(ligne); // je construit l'arbre de fuites
-        if (arbre == NULL) {
-            free(ligne);
-            fclose(fichier);
-            return -1.0;
-        }
-        NoeudAVL->ptr = arbre; // je lie l'arbre à son noeud AVL
-        liste_arbres = creationNoeudArbre(racine, ligne, liste_arbres); // je crée les liens entre les arbres
-        if (liste_arbres == NULL) {
-            free(ligne);
-            fclose(fichier);
-            return -1.0;
-        }
+    Liste* actuel = noeud->liste;
+    while (actuel != NULL) {
+        Liste* a_supprimer = actuel;
+        liberer_arbre_physique(actuel->enfant);
+        
+        actuel = actuel->next;
+        free(a_supprimer); // Libère le maillon de la liste
     }
-    free(ligne);
-    fclose(fichier);
-    // Recherche de l'arbre correspondant à l'ID donné
-    Arbre_liste* arbre_cible = rechercheArbre(racine, id); // on passe d'un const char a un char*
-    if (arbre_cible == NULL) {
 
+    if (noeud->id != NULL) {
+        free(noeud->id); // Libère la chaîne de caractères allouée par strdup/malloc
     }
-    return 0.0;
+    
+    free(noeud); // Libère la structure Arbre_liste
+}
+
+void suppression_AVL_FUITES(AVL_FUITES* racine) {
+    if (racine == NULL) return;
+
+    // Parcours post-fixe pour libérer les feuilles avant les parents
+    suppression_AVL_FUITES(racine->pGauche);
+    suppression_AVL_FUITES(racine->pDroit);
+
+    // Note importante : 
+    // On ne fait PAS free(racine->id) ici car c'est le même pointeur que noeud->id
+    // qui a déjà été libéré par liberer_arbre_physique.
+    
+    free(racine); 
 }
