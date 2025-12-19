@@ -5,6 +5,7 @@ t_initial=$(date +%s%3N)
 
 erreur_sortie() {
     echo "Erreur: $1" >&2
+    make clean > /dev/null 2>&1
     t_final=$(date +%s%3N)
     echo "Durée totale: $((t_final - t_initial)) ms"
     exit 1
