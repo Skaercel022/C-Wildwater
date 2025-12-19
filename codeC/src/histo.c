@@ -509,6 +509,48 @@ void fichier10PlusGrandesTraite(AVL_USINE* racine, char* nomFichierSortie) {
 
     fclose(fichierSortie);
 }
+//fonctions pour histo All
+
+void fichier10PlusGrandesAll(AVL_USINE* racine, char* nomFichierSortie) {
+    FILE* fichierSortie = fopen(nomFichierSortie, "w");
+    if (fichierSortie == NULL) {
+        exit(111);
+    }
+
+    AVL_USINE* tableauUsines[10];
+    int compteur = 0;
+
+    parcoursInfixeInsertionGrandesMax(racine, tableauUsines, &compteur);
+    triRapideUsinesDec(tableauUsines, 0, compteur - 1);
+
+    fprintf(fichierSortie, "ID_Usine;Volume disponible pour le traitement;Volume perdu après captage;Quantité réellement fournie en sortie d'usine\n");
+
+    for (int i = 0; i < compteur; i++) {
+        fprintf(fichierSortie, "%s;%d;%f;%f\n", tableauUsines[i]->val, tableauUsines[i]->max-tableauUsines[i]->capte, tableauUsines[i]->capte -tableauUsines[i]->traite,tableauUsines[i]->traite);
+    }
+
+    fclose(fichierSortie);
+}
+void fichier50PlusPetitesAll(AVL_USINE* racine, char* nomFichierSortie) {
+    FILE* fichierSortie = fopen(nomFichierSortie, "w");
+    if (fichierSortie == NULL) {
+        exit(111);
+    }
+
+    AVL_USINE* tableauUsines[50];
+    int compteur = 0;
+
+    parcoursInfixeInsertionPetitesMax(racine, tableauUsines, &compteur);
+    triRapideUsinesDec(tableauUsines, 0, compteur - 1);
+
+    fprintf(fichierSortie, "ID_Usine;Volume disponible pour le traitement;Volume perdu après captage;Quantité réellement fournie en sortie d'usine\n");
+
+    for (int i = 0; i < compteur; i++) {
+        fprintf(fichierSortie, "%s;%d;%f;%f\n", tableauUsines[i]->val, tableauUsines[i]->max-tableauUsines[i]->capte, tableauUsines[i]->capte -tableauUsines[i]->traite,tableauUsines[i]->traite);
+    }
+
+    fclose(fichierSortie);
+}
 
 //fonctions principales
 void creerFichiersVMax(AVL_USINE* racine) {
@@ -524,4 +566,9 @@ void creerFichiersVCapte(AVL_USINE* racine) {
 void creerFichiersVTraite(AVL_USINE* racine) {
     fichier50PlusPetitesTraite(racine, "vol_traite_50_petites.csv");
     fichier10PlusGrandesTraite(racine, "vol_traite_10_grandes.csv");
+
+}
+void creerFichiersAll(AVL_USINE* racine){
+	fichier50PlusPetitesAll(racine, "All_50_petites.csv");
+    fichier10PlusGrandesAll(racine, "All_10_grandes.csv");
 }
