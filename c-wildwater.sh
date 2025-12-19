@@ -44,10 +44,10 @@ fi
 
 if [[ "$MODE" = "histo" ]]; then
     case "$TYPE" in
-    max|src|real)
+    max|src|real|All)
         ;;
     *)
-        erreur_sortie "Type histogramme invalide (max | src | real)"
+        erreur_sortie "Type histogramme invalide (max | src | real|All)"
         ;;
     esac
 fi
@@ -113,8 +113,15 @@ if [ "$MODE" = "histo" ]; then
             COL=4
             TITRE="Volume réellement traité"
             ;;
+        All)
+            FILE_50PETITES="All_50_petites.csv"
+            FILE_10GRANDES="All_10_grandes.csv"
+            TITRE="Dans l'ensemble"
+            ;;
     esac
 
+    case "$TYPE" in
+	max|src|real)
     gnuplot << EOF
     set terminal pngcairo size 1600,800
     set output "${FILE_50PETITES%.csv}.png"
@@ -162,6 +169,66 @@ EOF
     plot "${FILE_10GRANDES}" using 0:(\$${COL}/1000):xtic(1) every ::1 \
         with boxes ls 1
 EOF
+	;;
+	All)
+	gnuplot << EOF
+    set terminal pngcairo size 1600,800
+    set output "${FILE_50PETITES%.csv}.png"
+
+    set datafile separator ";"
+    set style data histogram
+    set style histogram rowstacked
+    set style fill solid 1.0
+    set boxwidth 0.9
+
+    set style line 1 lc rgb "#008000"
+    set style line 2 lc rgb "#ff2c2c" 
+    set style line 3 lc rgb "#1f77b4" 
+    
+    set yrange [0:*]
+    set grid ytics
+    set key off
+
+    set title "${TITRE} – 50 plus petites usines"
+    set xlabel "Usines"
+    set ylabel "Volume (M.m³ / an)"
+
+    set xtics rotate by -45 font ",8"
+
+    plot "${FILE_50PETITES}" using 4:xtic(1)  ls 3, \\
+        '' using 3  ls 2, \\
+        '' using 2  ls 1
+EOF
+	gnuplot << EOF
+    set terminal pngcairo size 1400,800
+    set output "${FILE_10GRANDES%.csv}.png"
+
+    set datafile separator ";"
+    set style data histogram
+    set style histogram rowstacked
+    set style fill solid 1.0
+    set boxwidth 0.9
+
+    set style line 1 lc rgb "#008000"
+    set style line 2 lc rgb "#ff2c2c" 
+    set style line 3 lc rgb "#1f77b4" 
+
+    set yrange [0:*]
+    set grid ytics
+    set key off
+
+    set title "${TITRE} – 10 plus grandes usines"
+    set xlabel "Usines"
+    set ylabel "Volume (M.m³ / an)"
+
+    set xtics rotate by -30 font ",10"
+
+    plot "${FILE_10GRANDES}" using 4:xtic(1)  ls 3, \\
+        '' using 3  ls 2, \\
+        '' using 2  ls 1
+EOF
+	;;
+esac	
 fi
 
 if [ "$MODE" = "leaks" ]; then
