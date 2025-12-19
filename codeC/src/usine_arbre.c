@@ -23,8 +23,7 @@ Arbre_liste* constructeurArbre(LignesCSV* ligne){
     Arbre->coefficient_fuite=1.0;
     Arbre->Volume_parent=ligne->Volume;
     // Copie de l'id
-    Arbre->id=malloc(strlen(ligne->id_aval)+1);
-    strcpy(Arbre->id, ligne->id_aval);
+    Arbre->id=strdup(ligne->id_aval);
     return Arbre;
 }
 
@@ -40,7 +39,7 @@ AVL_FUITES* constructeurAVL(Arbre_liste* Noeud){
     if (nouveau == NULL){
         exit(1);
     }
-    nouveau->id = Noeud->id;
+    nouveau->id = strdup(Noeud->id);
     nouveau->pGauche = NULL;
     nouveau->pDroit = NULL;
     nouveau->equilibre = 0;
@@ -210,6 +209,8 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, const char* id){
     if (racine == NULL || id == NULL){
         return NULL;
     }
+    int comparaison = strcmp(id, racine->id);
+    printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
     if (strcmp(id, racine->id) == 0){
         return racine->ptr;
     }
@@ -235,37 +236,54 @@ void ajouterVolumeArbre(LignesCSV* ligne, Arbre_liste* racine){
 
 
 void ajouterNoeudArbre(AVL_FUITES** racine_AVL, LignesCSV* ligne, Arbre_liste** racine_physique) {
-    if (ligne == NULL) exit(200);
+    if (ligne == NULL) return;
     int h = 0;
 
-    // Premier nœud du réseau (Source)
-    if (*racine_AVL == NULL) {
-        Arbre_liste* nouveau = constructeurArbre(ligne);
-        *racine_AVL = InsertionAVL(*racine_AVL, nouveau, &h);
+    // --- 1. GÉRER LE PARENT (AMONT) ---
+    Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, ligne->id_amont);
+    if (Noeud_amont == NULL) {
+        // On crée manuellement le parent car on ne l'a pas encore vu
+        Noeud_amont = malloc(sizeof(Arbre_liste));
+        if(Noeud_amont == NULL){
+            exit(666);
+        }
+        Noeud_amont->liste = NULL;
+        Noeud_amont->nb_enfant = 0;
+        Noeud_amont->coefficient_fuite = 0.0; // Valeur par défaut
+        Noeud_amont->Volume_parent = 0.0;
         
-        // On sauvegarde ce premier nœud comme racine de l'arbre physique
-        if (*racine_physique == NULL) {
-            *racine_physique = nouveau;
-        }
-
-        if (ligne->Volume > 0.0) {
-            ajouterVolumeArbre(ligne, nouveau);
-        }
-    } 
-    else {
-        Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, ligne->id_amont);
+        // On alloue l'ID avec l'AMONT
+        Noeud_amont->id = malloc(strlen(ligne->id_amont) + 1);
+        strcpy(Noeud_amont->id, ligne->id_amont);
         
-        Arbre_liste* Noeud_aval = constructeurArbre(ligne);
+        *racine_AVL = InsertionAVL(*racine_AVL, Noeud_amont, &h);
+        
+        // Premier nœud vu = racine potentielle
+        if (*racine_physique == NULL) *racine_physique = Noeud_amont;
+    }
 
-        // Liaison parent-enfant dans l'arbre physique
-        if (Noeud_amont != NULL) {
-            ajouter_enfant(Noeud_amont, Noeud_aval);
-        }
-
-        if (ligne->Volume > 0.0) {
-            ajouterVolumeArbre(ligne, Noeud_aval);
-        }
+    // --- 2. GÉRER L'ENFANT (AVAL) ---
+    Arbre_liste* Noeud_aval = rechercheArbre(*racine_AVL, ligne->id_aval);
+    if (Noeud_aval == NULL) {
+        // On utilise ton constructeur habituel
+        Noeud_aval = constructeurArbre(ligne); 
+        h = 0;
         *racine_AVL = InsertionAVL(*racine_AVL, Noeud_aval, &h);
+    }
+
+    // --- 3. LIAISON ET DONNÉES ---
+    // On met à jour les données de l'enfant avec les infos de la ligne actuelle
+    Noeud_aval->coefficient_fuite = (float)ligne->fuite;
+    
+    // IMPORTANT : On n'ajoute l'enfant que s'il n'est pas déjà dans la liste du parent
+    // pour éviter les boucles et les Segfaults de récursion
+    if (rechercheliste(Noeud_amont->liste, Noeud_aval) == NULL) {
+        ajouter_enfant(Noeud_amont, Noeud_aval);
+    }
+
+    if (ligne->Volume > 0.0) {
+        // Utilise directement l'addition au lieu de ta fonction qui met la fuite à 0
+        Noeud_aval->Volume_parent += ligne->Volume;
     }
 }
 
@@ -290,11 +308,12 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     Liste* liste = noeud->liste;
     while (liste != NULL) {
         // Calcul des fuites locales
-        double fuite_vers_enfant = volume_entrant * (liste->enfant->coefficient_fuite / 100.0);
+        double volume_par_enfant = volume_entrant / nb_enfant;
         // Volume restant après fuite
-        double volume_arrivant = (volume_entrant - fuite_vers_enfant)/ nb_enfant;
+        Arbre_liste* enfant_noeud =  liste->enfant;
+        double fuite_locale = volume_par_enfant * (enfant_noeud->coefficient_fuite /100);
         // Appel récursif
-        total_fuites += fuite_vers_enfant + calculer_fuites_rec(liste->enfant, volume_arrivant);
+        total_fuites += fuite_locale + calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_locale);
         liste = liste->next;
     }
     return total_fuites;

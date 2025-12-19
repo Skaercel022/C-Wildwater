@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
             exit(99);
         }
         suppressionCompleteAVL_USINE(racine);
-    }
-    else if(strcmp(argv[1],"leaks") == 0){
-        const char* id_recherche = argv[2];
+    }else if(strcmp(argv[1],"leaks") == 0){
+        const char* id_recherche = strdup(argv[2]);
+        printf("DEBUG: Je recherche l'ID exact suivant : [%s]\n", id_recherche);
         const char* nom_fichier = argv[3];
 
         FILE* fp = fopen(nom_fichier, "r");
@@ -43,18 +43,21 @@ int main(int argc, char** argv) {
         while (lireEtParserLigne(fp, ligne_temp) == Parsing_OK) {
             ajouterNoeudArbre(&index_avl, ligne_temp, &racine_physique);
         }
-        double pertes = calculer_fuites(index_avl, id_recherche);
-        if (pertes < -0.5) { // Si calculer_fuites a retourné -1
+        fclose(fp);
+        Arbre_liste* noeud_depart= rechercheArbre(index_avl, id_recherche);
+        if (noeud_depart == NULL) {
             printf("%s;-1\n", id_recherche);
         } else {
+            double pertes = calculer_fuites_rec(noeud_depart, noeud_depart->Volume_parent);
             // Conversion de milliers de m3 vers millions de m3
             printf("%s;%.3f\n", id_recherche, pertes / 1000.0);
         }
-        liberer_arbre_physique(racine_physique);
 
+        liberer_arbre_physique(racine_physique);
         suppression_AVL_FUITES(index_avl);
         free(ligne_temp);
     }
+    
     else{
         exit(99);
     }
