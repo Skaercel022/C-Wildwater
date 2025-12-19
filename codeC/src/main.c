@@ -22,6 +22,9 @@ int main(int argc, char** argv) {
         else if(strcmp(argv[2],"real") == 0){
             creerFichiersVTraite(racine);
         }
+        else if(strcmp(argv[2],"All") ==0){
+            creerFichiersAll(racine);
+       }
         else{
             suppressionCompleteAVL_USINE(racine);
             exit(99);
@@ -64,4 +67,5 @@ int main(int argc, char** argv) {
 
 
     return 0;
+
 }
