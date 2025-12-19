@@ -125,7 +125,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                 char* copie = malloc(strlen(id_usine) + 1);
                 if (copie == NULL) {
                     free(ligne);
-                    exit(105);
+                    exit(104);
                 }
                 strcpy(copie, id_usine);
 
@@ -222,7 +222,7 @@ void fichier50PlusPetitesMax(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
-        exit(106);
+        exit(101);
 
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
@@ -278,7 +278,7 @@ void fichier50PlusPetitesCapte(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
-        exit(107);
+        exit(101);
 
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
@@ -331,7 +331,7 @@ void fichier50PlusPetitesTraite(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
-        exit(108);
+        exit(101);
 
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
@@ -386,7 +386,7 @@ void parcoursInfixeInsertionGrandesMax(AVL_USINE* noeud, AVL_USINE** tableauUsin
 void fichier10PlusGrandesMax(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
-        exit(109);
+        exit(101);
     }
 
     AVL_USINE* tableauUsines[10];
@@ -439,7 +439,7 @@ void parcoursInfixeInsertionGrandesCapte(AVL_USINE* noeud, AVL_USINE** tableauUs
 void fichier10PlusGrandesCapte(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
-        exit(110);
+        exit(101);
     }
 
     AVL_USINE* tableauUsines[10];
@@ -492,7 +492,7 @@ void parcoursInfixeInsertionGrandesTraite(AVL_USINE* noeud, AVL_USINE** tableauU
 void fichier10PlusGrandesTraite(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
-        exit(111);
+        exit(101);
     }
 
     AVL_USINE* tableauUsines[10];

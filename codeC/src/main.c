@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
         }
         else{
             suppressionCompleteAVL_USINE(racine);
-            exit(100);
+            exit(99);
         }
         suppressionCompleteAVL_USINE(racine);
     }
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 
     }
     else{
-        exit(300);
+        exit(99);
     }
 
 

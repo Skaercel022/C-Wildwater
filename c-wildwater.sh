@@ -10,6 +10,19 @@ erreur_sortie() {
     exit 1
 }
 
+exit_c() {
+    case "$1" in
+        99) echo "Erreur : arguments invalides" ;;
+        101) echo "Erreur : ouverture fichier" ;;
+        102) echo "Erreur : fermeture fichier" ;;
+        103) echo "Erreur : ligne csv mal formée" ;;
+        104) echo "Erreur : allocation mémoire" ;;
+    esac
+    t_final=$(date +%s%3N)
+    echo "Durée totale: $((t_final - t_initial)) ms"
+    exit 1
+}
+
 #verif arg
 if [ "$#" -ne 3 ]; then
     erreur_sortie "Usage 1 : $0 <fichier_donnees> histo <max|src|real>
@@ -73,7 +86,7 @@ if [ "$MODE" = "histo" ]; then
         cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
         make clean > /dev/null 2>&1
         cd - > /dev/null || true
-        erreur_sortie "Le programme C a retourné une erreur"
+        exit_c $RET
     fi
 
     cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
@@ -166,7 +179,7 @@ if [ "$MODE" = "leaks" ]; then
         cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
         make clean > /dev/null 2>&1
         cd - > /dev/null || true
-        erreur_sortie "Le programme C a retourné une erreur"
+        exit_c $RET
     fi
 
     cd codeC || erreur_sortie "Impossible d'entrer dans codeC pour clean"
