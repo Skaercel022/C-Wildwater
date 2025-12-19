@@ -164,7 +164,7 @@ EOF
 fi
 
 if [ "$MODE" = "leaks" ]; then
-    awk -F';' -v type="$TYPE" '$1 == type || $2 == type' "$DATA_FILE" > "$TMP_FILE"
+    cat "$DATA_FILE" | grep "$TYPE" | cut -f2,3,4,5 -d ';' | grep -v "$TYPE" | tr '-' '0' > "$TMP_FILE"
     
     if [ ! -s "$TMP_FILE" ]; then
         erreur_sortie "L'usine avec l'ID spécifiée n'a pas été trouvée"
