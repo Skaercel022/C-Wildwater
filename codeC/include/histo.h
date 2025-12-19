@@ -10,6 +10,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine);
 void creerFichiersVMax(AVL_USINE* racine);
 void creerFichiersVTraite(AVL_USINE* racine);
 void creerFichiersVCapte(AVL_USINE* racine);
+void creerFichiersAll(AVL_USINE* racine);
 
 void fichier10PlusGrandesMax(AVL_USINE* racine, char* nomFichierSortie);
 void fichier50PlusPetitesMax(AVL_USINE* racine, char* nomFichierSortie);
@@ -17,6 +18,8 @@ void fichier10PlusGrandesTraite(AVL_USINE* racine, char* nomFichierSortie);
 void fichier50PlusPetitesTraite(AVL_USINE* racine, char* nomFichierSortie);
 void fichier10PlusGrandesCapte(AVL_USINE* racine, char* nomFichierSortie);
 void fichier50PlusPetitesCapte(AVL_USINE* racine, char* nomFichierSortie);
+void fichier10PlusGrandesAll(AVL_USINE* racine, char* nomFichierSortie);
+void fichier50PlusPetitesAll(AVL_USINE* racine, char* nomFichierSortie);
 
 
 #endif // histo_h
