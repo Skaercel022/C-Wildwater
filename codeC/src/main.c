@@ -4,7 +4,7 @@
 int main(int argc, char** argv) {
     
     if (argc != 4){
-        exit(100);
+        exit(99);
     }
         
     if (strcmp(argv[1],"histo") == 0){
@@ -24,11 +24,16 @@ int main(int argc, char** argv) {
         }
         else{
             suppressionCompleteAVL_USINE(racine);
-            exit(101);
+            exit(100);
         }
         suppressionCompleteAVL_USINE(racine);
     }
-    
+    else if(strcmp(argv[1],"leaks") == 0){
+
+    }
+    else{
+        exit(300);
+    }
 
 
     return 0;

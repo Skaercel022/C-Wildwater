@@ -5,7 +5,7 @@ FILE* ouvrirFichierEcriture(char* nom_fichier) {
 
     FILE* fichier = fopen(nom_fichier, "r");
     if (fichier == NULL) {
-        exit(50);
+        exit(101);
     }
     return fichier;
 }
@@ -13,7 +13,7 @@ FILE* ouvrirFichierEcriture(char* nom_fichier) {
 //fonction de fermeture de fichier
 void fermerFichier(FILE* fichier){
     if(fclose(fichier) != 0){
-        exit(51);
+        exit(102);
     }
 }
 
@@ -78,7 +78,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
         //erreur ligne csv mal formée
         if (!col1 || !col2 || !col3 || !col4 || !col5) {
             free(ligne);
-            exit(60);
+            exit(103);
         }
         
         //ligne "usine" on ajouter volume max
@@ -93,7 +93,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                 char* copie = malloc(strlen(id_usine) + 1);
                 if (copie == NULL) {
                     free(ligne);
-                    exit(52);
+                    exit(104);
                 }
                 strcpy(copie, id_usine);
 
@@ -125,7 +125,7 @@ void lectureFichierVersAVL(FILE* fichier, AVL_USINE** racine) {
                 char* copie = malloc(strlen(id_usine) + 1);
                 if (copie == NULL) {
                     free(ligne);
-                    exit(52);
+                    exit(105);
                 }
                 strcpy(copie, id_usine);
 
@@ -222,7 +222,7 @@ void fichier50PlusPetitesMax(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
-        exit(53);
+        exit(106);
 
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
@@ -278,7 +278,7 @@ void fichier50PlusPetitesCapte(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
-        exit(53);
+        exit(107);
 
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
@@ -331,7 +331,7 @@ void fichier50PlusPetitesTraite(AVL_USINE* racine, char* nomFichierSortie) {
 
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL)
-        exit(53);
+        exit(108);
 
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
@@ -386,7 +386,7 @@ void parcoursInfixeInsertionGrandesMax(AVL_USINE* noeud, AVL_USINE** tableauUsin
 void fichier10PlusGrandesMax(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
-        exit(53);
+        exit(109);
     }
 
     AVL_USINE* tableauUsines[10];
@@ -439,7 +439,7 @@ void parcoursInfixeInsertionGrandesCapte(AVL_USINE* noeud, AVL_USINE** tableauUs
 void fichier10PlusGrandesCapte(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
-        exit(53);
+        exit(110);
     }
 
     AVL_USINE* tableauUsines[10];
@@ -492,7 +492,7 @@ void parcoursInfixeInsertionGrandesTraite(AVL_USINE* noeud, AVL_USINE** tableauU
 void fichier10PlusGrandesTraite(AVL_USINE* racine, char* nomFichierSortie) {
     FILE* fichierSortie = fopen(nomFichierSortie, "w");
     if (fichierSortie == NULL) {
-        exit(53);
+        exit(111);
     }
 
     AVL_USINE* tableauUsines[10];

@@ -401,7 +401,7 @@ double calcule_fuites(const char* nom_fichier, const char* id){
     free(ligne);
     fclose(fichier);
     // Recherche de l'arbre correspondant à l'ID donné
-    Arbre_liste* arbre_cible = rechercheArbre(racine, (char*) id); // on passe d'un const char a un char*
+    Arbre_liste* arbre_cible = rechercheArbre(racine, id); // on passe d'un const char a un char*
     if (arbre_cible == NULL) {
 
     }
