@@ -62,42 +62,29 @@ void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     parent->nb_enfant+=1;
 }
 
-Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat) {
-    if (!fichier || !resultat) return Erreur_Pointeur_Nul;
-
+int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, double*  fuite){
+    if (!id_amont || !id_aval || !volume || !fuite || !id_usine){
+        return 0;
+    }
     char buffer[1024];
-    if (!fgets(buffer, sizeof(buffer), fichier)) {
-        if (feof(fichier)) return EOF; // fin de fichier
-        return Erreur_Format_Token;
+    while(fgets(buffer,sizeof(buffer),stdin)){
+        char* token = strtok(buffer, ";");
+        id_usine = strdup(token);
+        token = strtok(NULL,";");
+
+        id_amont = strdup(token);
+        token = strtok(NULL,";");
+
+        id_aval = strdup(token);
+        token = strtok(NULL,";");
+
+        *volume = atof(token);
+        token = strtok(NULL,";");
+
+        *fuite = atof(token);
     }
 
-    buffer[strcspn(buffer, "\n")] = '\0';
-
-    char* token = strtok(buffer, ";");
-    int colonne_count = 0;
-    char* tokens[4];
-
-    while (token && colonne_count < 4) {
-        tokens[colonne_count++] = token;
-        token = strtok(NULL, ";");
-    }
-
-    if (colonne_count != 4) return Erreur_NB_colonnes;
-
-    strncpy(resultat->id_amont, tokens[0], LONGUEUR_ID - 1);
-    resultat->id_amont[LONGUEUR_ID - 1] = '\0';
-    strncpy(resultat->id_aval, tokens[1], LONGUEUR_ID - 1);
-    resultat->id_aval[LONGUEUR_ID - 1] = '\0';
-
-    char* endptr;
-
-    resultat->Volume = strtod(tokens[2], &endptr);
-    if (endptr == tokens[2]) return Erreur_Format_Token;
-
-    resultat->fuite = strtod(tokens[3], &endptr);
-    if (endptr == tokens[3]) return Erreur_Format_Token;
-
-    return Parsing_OK;
+    return 1;
 }
 
 // Fonctions pour l'AVL
@@ -320,8 +307,8 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     if (noeud == NULL || volume_entrant <= 0.0) {
         return 0.0;
     }
-
-    double total_fuites = 0.0;
+    double fuite_locale = (noeud->coefficient_fuite / 100.0) * volume_entrant;
+    double total_fuites = fuite_locale;
 
     // Compter le nombre d'enfants
     int nb_enfant = 0;
@@ -340,12 +327,12 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     Liste* liste = noeud->liste;
     while (liste != NULL) {
         if (liste->enfant != NULL) {
+            double volume_restant = volume_entrant - fuite_locale;
             // Calcul des fuites locales
-            double volume_par_enfant = volume_entrant / nb_enfant;
+            double volume_par_enfant = volume_restant / nb_enfant;
             // Volume restant après fuite
-            double fuite_locale = volume_par_enfant * (liste->enfant->coefficient_fuite / 100.0);
             // Appel récursif
-            total_fuites += fuite_locale + calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_locale);
+            total_fuites +=  calculer_fuites_rec(liste->enfant, volume_par_enfant);
         }
         liste = liste->next;
     }

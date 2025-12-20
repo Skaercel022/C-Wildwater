@@ -191,13 +191,13 @@ EOF
 
     set title "${TITRE} – 50 plus petites usines"
     set xlabel "Usines"
-    set ylabel "Volume (M.m³ / an)"
+    set ylabel "Volume (M.m³ / an x 10^-3)"
 
     set xtics rotate by -45 font ",8"
 
-    plot "${FILE_50PETITES}" using 4:xtic(1)  ls 3, \\
-        '' using 3  ls 2, \\
-        '' using 2  ls 1
+    plot "${FILE_50PETITES}" using (\$4/1000):xtic(1) ls 3, \\
+         '' using (\$3/1000) ls 2, \\
+         '' using (\$2/1000) ls 1
 EOF
 	gnuplot << EOF
     set terminal pngcairo size 1400,800
@@ -219,13 +219,13 @@ EOF
 
     set title "${TITRE} – 10 plus grandes usines"
     set xlabel "Usines"
-    set ylabel "Volume (M.m³ / an)"
+    set ylabel "Volume (M.m³ / an x 10^-3)"
 
     set xtics rotate by -30 font ",10"
 
-    plot "${FILE_10GRANDES}" using 4:xtic(1)  ls 3, \\
-        '' using 3  ls 2, \\
-        '' using 2  ls 1
+    plot "${FILE_10GRANDES}" using (\$4/1000):xtic(1) ls 3, \\
+         '' using (\$3/1000) ls 2, \\
+         '' using (\$2/1000) ls 1
 EOF
 	;;
 esac	

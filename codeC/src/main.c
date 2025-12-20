@@ -3,11 +3,10 @@
 
 int main(int argc, char** argv) {
     
-    if (argc != 4){
-        exit(99);
-    }
-        
     if (strcmp(argv[1],"histo") == 0){
+        if (argc != 4){
+            exit(99);
+        }
         FILE* fichier = ouvrirFichier(argv[3]);
         AVL_USINE* racine = NULL;
         lectureFichierVersAVL(fichier, &racine);
@@ -32,21 +31,25 @@ int main(int argc, char** argv) {
         suppressionCompleteAVL_USINE(racine);
     }
     else if(strcmp(argv[1],"leaks") == 0){
+        if(argc != 3){
+            exit(99);
+        }
         char* id_recherche = strdup(argv[2]);
         printf("DEBUG: Je recherche l'ID exact suivant : [%s]\n", id_recherche);
-        char* nom_fichier = argv[3];
 
-        FILE* fp = ouvrirFichier(nom_fichier);
 
         AVL_FUITES* index_avl = NULL;
         Arbre_liste* racine_physique = NULL;
-        LignesCSV* ligne_temp = creerLigneCSV();
+        char id_usine[256];
+        char id_amont[256];
+        char id_aval[256];
+        double volume;
+        double fuite;  
 
         // Construction
-        while (lireEtParserLigne(fp, ligne_temp) == Parsing_OK) {
+        while (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite)) {
             ajouterNoeudArbre(&index_avl, ligne_temp, &racine_physique);
         }
-        fclose(fp);
         Arbre_liste* noeud_depart= rechercheArbre(index_avl, id_recherche);
         if (noeud_depart == NULL) {
             printf("%s;-1\n", id_recherche);
@@ -58,7 +61,6 @@ int main(int argc, char** argv) {
 
         liberer_arbre_physique(racine_physique);
         suppression_AVL_FUITES(index_avl);
-        free(ligne_temp);
     }
     
     else{

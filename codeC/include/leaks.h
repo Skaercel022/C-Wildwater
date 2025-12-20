@@ -31,25 +31,9 @@ typedef struct avl_fuites{
 }AVL_FUITES;
 
 
-typedef struct {
-    char id_amont[LONGUEUR_ID];
-    char id_aval[LONGUEUR_ID];
-    double Volume;
-    double fuite;
-}LignesCSV;
-
-typedef enum {
-    Parsing_OK,
-    Erreur_Allocation,
-    Erreur_Format_Token,
-    Erreur_Champ_Vide,
-    Erreur_NB_colonnes,
-    Erreur_Pointeur_Nul,
-}Code_Erreur;
-
 // --- Gestion des lignes CSV ---
 LignesCSV* creerLigneCSV();
-Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat);
+int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* Volume, double*  fuite);
 
 //  Gestion de l'Arbre Physique 
 Arbre_liste* constructeurArbre(LignesCSV* ligne);
