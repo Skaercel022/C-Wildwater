@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
     }
         
     if (strcmp(argv[1],"histo") == 0){
-        FILE* fichier = ouvrirFichierEcriture(argv[3]);
+        FILE* fichier = ouvrirFichier(argv[3]);
         AVL_USINE* racine = NULL;
         lectureFichierVersAVL(fichier, &racine);
         fermerFichier(fichier);
@@ -32,12 +32,11 @@ int main(int argc, char** argv) {
         suppressionCompleteAVL_USINE(racine);
     }
     else if(strcmp(argv[1],"leaks") == 0){
-        const char* id_recherche = strdup(argv[2]);
+        char* id_recherche = strdup(argv[2]);
         printf("DEBUG: Je recherche l'ID exact suivant : [%s]\n", id_recherche);
-        const char* nom_fichier = argv[3];
+        char* nom_fichier = argv[3];
 
-        FILE* fp = fopen(nom_fichier, "r");
-        if (fp == NULL) exit(101);
+        FILE* fp = ouvrirFichier(nom_fichier);
 
         AVL_FUITES* index_avl = NULL;
         Arbre_liste* racine_physique = NULL;

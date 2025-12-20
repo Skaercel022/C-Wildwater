@@ -1,7 +1,7 @@
 #ifndef histo_h
 #define histo_h
 
-FILE* ouvrirFichierEcriture(char* nom_fichier);
+FILE* ouvrirFichier(char* nom_fichier);
 void fermerFichier(FILE* fichier);
 int estVide(char *s);
 char* lireLigne(FILE* fichier);

@@ -219,19 +219,17 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, const char* id){
     if (racine == NULL || id == NULL){
         return NULL;
     }
+    if (racine->id == NULL) {
+        return NULL;
+    }
     int comparaison = strcmp(id, racine->id);
     printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
-    if (strcmp(id, racine->id) == 0){
+    if (comparaison == 0) {
         return racine->ptr;
-    }
-    else if (strcmp(id, racine->id) < 0){
+    } else if (comparaison < 0) {
         return rechercheArbre(racine->pGauche, id);
-    }
-    else if(strcmp(id, racine->id) > 0){
+    } else {
         return rechercheArbre(racine->pDroit, id);
-    }
-    else{
-        return NULL;
     }
 }
 
