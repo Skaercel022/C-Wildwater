@@ -4,26 +4,18 @@
 
 // Création des structures :
 
-LignesCSV* creerLigneCSV() {
-    LignesCSV* ligne=malloc(sizeof(LignesCSV));
-    if(ligne == NULL){
-        return NULL;
-    }
-    strcpy(ligne->id_amont, "");
-    strcpy(ligne->id_aval, "");
-    ligne->Volume = 0.0;
-    ligne->fuite = 0.0;
-    return ligne;
-}
-
-Arbre_liste* constructeurArbre(LignesCSV* ligne){
+Arbre_liste* constructeurArbre(char* id, double fuite){
     Arbre_liste* Arbre=malloc(sizeof(Arbre_liste));
     Arbre->liste=NULL;
     Arbre->nb_enfant=0;
-    Arbre->coefficient_fuite=1.0;
-    Arbre->Volume_parent=ligne->Volume;
+    Arbre->coefficient_fuite= fuite;
+    Arbre->Volume_parent=0.0;
     // Copie de l'id
-    Arbre->id=strdup(ligne->id_aval);
+    Arbre->id=strdup(id);
+    if (Arbre->id == NULL){
+        free(Arbre);
+        exit(200);
+    }
     return Arbre;
 }
 
@@ -205,7 +197,15 @@ Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id) {
         return NULL;
     }
 
+    int securite = 0; // Compteur de sécurité
+    
     while (liste != NULL) {
+        // PROTECTION ANTI-BOUCLE INFINIE
+        if (securite++ > 10000) { 
+            fprintf(stderr, "ERREUR CRITIQUE : Cycle détecté dans la liste des enfants de %s !\n", Id->id);
+            exit(505); // On arrête tout pour que tu voies l'erreur
+        }
+
         if (liste->enfant != NULL && liste->enfant->id != NULL) {
             if (strcmp(liste->enfant->id, Id->id) == 0) {
                 return liste->enfant;
@@ -216,7 +216,7 @@ Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id) {
     return NULL;
 }
 
-Arbre_liste* rechercheArbre(AVL_FUITES* racine, const char* id){
+Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
     if (racine == NULL || id == NULL){
         return NULL;
     }
@@ -235,69 +235,53 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, const char* id){
 }
 
 // ajout d'un volume depuis une source
-void ajouterVolumeArbre(LignesCSV* ligne, Arbre_liste* racine){
-        double fuite = (ligne->fuite/100.0)*ligne->Volume;
-        racine->Volume_parent+=fuite;
+void ajouterVolumeArbre(double fuite, double Volume, Arbre_liste* racine){
+        double fuite_locale = (fuite/100.0)*Volume;
+        racine->Volume_parent+=fuite_locale;
         racine->coefficient_fuite=0;
 }
 
 
 
 
-void ajouterNoeudArbre(AVL_FUITES** racine_AVL, LignesCSV* ligne, Arbre_liste** racine_physique) {
-    if (ligne == NULL || racine_AVL == NULL || racine_physique == NULL) {
+void ajouterNoeudArbre(AVL_FUITES** racine_AVL, Arbre_liste** racine_physique, char* id_amont, char* id_aval, double volume, double fuite) {
+    if (racine_AVL == NULL || racine_physique == NULL) {
         return;
     }
 
     int h = 0;
 
     // --- 1. GÉRER LE PARENT (AMONT) ---
-    Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, ligne->id_amont);
+    Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, id_amont);
     if (Noeud_amont == NULL) {
-        Noeud_amont = malloc(sizeof(Arbre_liste));
-        if (Noeud_amont == NULL) {
-            exit(666);
-        }
-
-        Noeud_amont->liste = NULL;
-        Noeud_amont->nb_enfant = 0;
-        Noeud_amont->coefficient_fuite = 0.0;
-        Noeud_amont->Volume_parent = 0.0;
-
-        // Allouer l'ID avec l'AMONT
-        Noeud_amont->id = strdup(ligne->id_amont);
-        if (Noeud_amont->id == NULL) {
-            free(Noeud_amont);
-            exit(666);
-        }
-
+        Noeud_amont = constructeurArbre(id_amont, 0.0);
         *racine_AVL = InsertionAVL(*racine_AVL, Noeud_amont, &h);
-
-        // Premier nœud vu = racine potentielle
         if (*racine_physique == NULL) {
             *racine_physique = Noeud_amont;
         }
     }
-
+    if (strcmp(id_amont, id_aval) == 0) {
+    return;
+    }
     // --- 2. GÉRER L'ENFANT (AVAL) ---
-    Arbre_liste* Noeud_aval = rechercheArbre(*racine_AVL, ligne->id_aval);
+    Arbre_liste* Noeud_aval = rechercheArbre(*racine_AVL, id_aval);
     if (Noeud_aval == NULL) {
-        Noeud_aval = constructeurArbre(ligne);
+        Noeud_aval = constructeurArbre(id_aval,fuite);
         h = 0;
         *racine_AVL = InsertionAVL(*racine_AVL, Noeud_aval, &h);
     }
+    else{
+        Noeud_aval->coefficient_fuite = fuite;
+    }
 
-    // --- 3. LIAISON ET DONNÉES ---
-    // Mettre à jour les données de l'enfant avec les infos de la ligne actuelle
-    Noeud_aval->coefficient_fuite = (float)ligne->fuite;
-
+   
     // IMPORTANT : On n'ajoute l'enfant que s'il n'est pas déjà dans la liste du parent
     if (rechercheliste(Noeud_amont->liste, Noeud_aval) == NULL) {
         ajouter_enfant(Noeud_amont, Noeud_aval);
     }
 
-    if (ligne->Volume > 0.0) {
-        Noeud_aval->Volume_parent += ligne->Volume;
+    if (volume > 0.0) {
+        Noeud_aval->Volume_parent += volume;
     }
 }
 
@@ -339,7 +323,7 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     return total_fuites;
 }
 
-double calculer_fuites(AVL_FUITES* racine_AVL, const char* id_usine) {
+double calculer_fuites(AVL_FUITES* racine_AVL, char* id_usine) {
     if (racine_AVL == NULL || id_usine == NULL) {
         exit(210);
     }

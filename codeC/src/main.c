@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
         // Construction
         while (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite)) {
-            ajouterNoeudArbre(&index_avl, ligne_temp, &racine_physique);
+            ajouterNoeudArbre(&index_avl, &racine_physique, id_amont, id_aval, volume, fuite);
         }
         Arbre_liste* noeud_depart= rechercheArbre(index_avl, id_recherche);
         if (noeud_depart == NULL) {
