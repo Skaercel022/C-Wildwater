@@ -297,27 +297,33 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     if (noeud == NULL || volume_entrant <= 0.0) {
         return 0.0;
     }
+
     double total_fuites = 0.0;
 
-    // compter le nombre d'enfants
-    int nb_enfant =  0;
-    Liste *tmp = noeud->liste;
+    // Compter le nombre d'enfants
+    int nb_enfant = 0;
+    Liste* tmp = noeud->liste;
     while (tmp != NULL) {
-        nb_enfant++;
+        if (tmp->enfant != NULL) {
+            nb_enfant++;
+        }
         tmp = tmp->next;
     }
+
     if (nb_enfant == 0) {
         return 0.0; // Pas d'enfants, pas de fuites
     }
+
     Liste* liste = noeud->liste;
     while (liste != NULL) {
-        // Calcul des fuites locales
-        double volume_par_enfant = volume_entrant / nb_enfant;
-        // Volume restant après fuite
-        Arbre_liste* enfant_noeud =  liste->enfant;
-        double fuite_locale = volume_par_enfant * (enfant_noeud->coefficient_fuite /100);
-        // Appel récursif
-        total_fuites += fuite_locale + calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_locale);
+        if (liste->enfant != NULL) {
+            // Calcul des fuites locales
+            double volume_par_enfant = volume_entrant / nb_enfant;
+            // Volume restant après fuite
+            double fuite_locale = volume_par_enfant * (liste->enfant->coefficient_fuite / 100.0);
+            // Appel récursif
+            total_fuites += fuite_locale + calculer_fuites_rec(liste->enfant, volume_par_enfant - fuite_locale);
+        }
         liste = liste->next;
     }
     return total_fuites;
