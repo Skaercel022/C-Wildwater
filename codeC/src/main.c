@@ -22,7 +22,7 @@ int main(int argc, char** argv) {
         else if(strcmp(argv[2],"real") == 0){
             creerFichiersVTraite(racine);
         }
-        else if(strcmp(argv[2],"All") ==0){
+        else if(strcmp(argv[2],"all") ==0){
             creerFichiersAll(racine);
        }
         else{
@@ -30,7 +30,8 @@ int main(int argc, char** argv) {
             exit(99);
         }
         suppressionCompleteAVL_USINE(racine);
-    }else if(strcmp(argv[1],"leaks") == 0){
+    }
+    else if(strcmp(argv[1],"leaks") == 0){
         const char* id_recherche = strdup(argv[2]);
         printf("DEBUG: Je recherche l'ID exact suivant : [%s]\n", id_recherche);
         const char* nom_fichier = argv[3];

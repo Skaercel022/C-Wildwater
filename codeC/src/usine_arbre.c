@@ -63,76 +63,80 @@ void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
 }
 
 Code_Erreur lireEtParserLigne(FILE* fichier, LignesCSV* resultat) {
-    if (fichier == NULL || resultat == NULL) {
-        return Erreur_Pointeur_Nul;
-    }
-    // Buffer pour lire la ligne
+    if (!fichier || !resultat) return Erreur_Pointeur_Nul;
+
     char buffer[1024];
-    if (fgets(buffer, sizeof(buffer), fichier) == NULL) {
+    if (!fgets(buffer, sizeof(buffer), fichier)) {
+        if (feof(fichier)) return EOF; // fin de fichier
         return Erreur_Format_Token;
     }
-    // Supprimer le '\n' final si présent
+
     buffer[strcspn(buffer, "\n")] = '\0';
-    // Parsing
-    char* token[4];
-    const char delimiteur[] = ";";
-    char* ligne_copy = strdup(buffer);
-    if (ligne_copy == NULL) {
-        return Erreur_Allocation;
-    }
+
+    char* token = strtok(buffer, ";");
     int colonne_count = 0;
-    char* token_courant = strtok(ligne_copy, delimiteur);
-    while (token_courant != NULL && colonne_count < 4) {
-        token[colonne_count++] = token_courant;
-        token_courant = strtok(NULL, delimiteur);
+    char* tokens[4];
+
+    while (token && colonne_count < 4) {
+        tokens[colonne_count++] = token;
+        token = strtok(NULL, ";");
     }
-    free(ligne_copy);
-    if (colonne_count != 4) {
-        return Erreur_NB_colonnes;
-    }
-    // Remplir les champs
-    strncpy(resultat->id_amont, token[0], LONGUEUR_ID - 1);
+
+    if (colonne_count != 4) return Erreur_NB_colonnes;
+
+    strncpy(resultat->id_amont, tokens[0], LONGUEUR_ID - 1);
     resultat->id_amont[LONGUEUR_ID - 1] = '\0';
-    strncpy(resultat->id_aval, token[1], LONGUEUR_ID - 1);
+    strncpy(resultat->id_aval, tokens[1], LONGUEUR_ID - 1);
     resultat->id_aval[LONGUEUR_ID - 1] = '\0';
-    resultat->Volume = atof(token[2]);
-    resultat->fuite = atof(token[3]);
+
+    char* endptr;
+
+    resultat->Volume = strtod(tokens[2], &endptr);
+    if (endptr == tokens[2]) return Erreur_Format_Token;
+
+    resultat->fuite = strtod(tokens[3], &endptr);
+    if (endptr == tokens[3]) return Erreur_Format_Token;
+
     return Parsing_OK;
 }
 
 // Fonctions pour l'AVL
-AVL_FUITES* RotationDroite(AVL_FUITES* racine){
+AVL_FUITES* RotationDroite_FUITES(AVL_FUITES* racine) {
+    if (!racine || !racine->pGauche) return racine;
+
     AVL_FUITES* nouvelle_racine = racine->pGauche;
     racine->pGauche = nouvelle_racine->pDroit;
     nouvelle_racine->pDroit = racine;
 
     // Mise à jour des facteurs d'équilibre
-    racine->equilibre = racine->equilibre + 1 - (nouvelle_racine->equilibre < 0 ? nouvelle_racine->equilibre : 0);
-    nouvelle_racine->equilibre = nouvelle_racine->equilibre + 1 + (racine->equilibre > 0 ? racine->equilibre : 0);
+    racine->equilibre = racine->equilibre - 1 - max(nouvelle_racine->equilibre, 0);
+    nouvelle_racine->equilibre = nouvelle_racine->equilibre - 1 + min(racine->equilibre, 0);
 
     return nouvelle_racine;
 }
 
-AVL_FUITES* rotationgauche_FUITES(AVL_FUITES* racine){
+AVL_FUITES* RotationGauche_FUITES(AVL_FUITES* racine) {
+    if (!racine || !racine->pDroit) return racine;
+
     AVL_FUITES* nouvelle_racine = racine->pDroit;
     racine->pDroit = nouvelle_racine->pGauche;
     nouvelle_racine->pGauche = racine;
 
     // Mise à jour des facteurs d'équilibre
-    racine->equilibre = racine->equilibre - 1 - (nouvelle_racine->equilibre > 0 ? nouvelle_racine->equilibre : 0);
-    nouvelle_racine->equilibre = nouvelle_racine->equilibre - 1 + (racine->equilibre < 0 ? racine->equilibre : 0);
+    racine->equilibre = racine->equilibre + 1 - min(nouvelle_racine->equilibre, 0);
+    nouvelle_racine->equilibre = nouvelle_racine->equilibre + 1 + max(racine->equilibre, 0);
 
     return nouvelle_racine;
 }
 
 AVL_FUITES* doubleRotationGauche_FUITES(AVL_FUITES* racine){
-    racine->pGauche = rotationgauche_FUITES(racine->pGauche);
-    return RotationDroite(racine);
+    racine->pGauche = RotationDroite_FUITES(racine->pGauche);
+    return RotationGauche_FUITES(racine);
 }
 
 AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine){
-    racine->pDroit = RotationDroite(racine->pDroit);
-    return rotationgauche_FUITES(racine);
+    racine->pDroit = RotationGauche_FUITES(racine->pDroit);
+    return RotationDroite_FUITES(racine);
 }
 
 
@@ -178,7 +182,7 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h){
             if (racine->pGauche->equilibre > 0) {
                 return doubleRotationGauche_FUITES(racine); 
             } else {
-                return RotationDroite(racine);
+                return RotationDroite_FUITES(racine);
             }
         } 
         // Déséquilibre droite (+2)
@@ -186,7 +190,7 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h){
             if (racine->pDroit->equilibre < 0) {
                 return doubleRotationDroite_FUITES(racine);
             } else {
-                return rotationgauche_FUITES(racine); 
+                return RotationGauche_FUITES(racine); 
             }
         }
     }
