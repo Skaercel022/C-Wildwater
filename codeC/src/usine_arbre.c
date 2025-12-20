@@ -140,57 +140,71 @@ AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine){
 }
 
 
-AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h){
-    
-    if (racine == NULL){
+AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h) {
+    if (racine == NULL) {
         *h = 1;
         return constructeurAVL(Noeud);
     }
-    int comparaison=strcmp(Noeud->id, racine->id);
-    if (comparaison < 0){
-        racine->pGauche = InsertionAVL(racine->pGauche, Noeud, h);
-        if(*h!=0){
-            racine->equilibre--;
-        }
-    }
-    else if (comparaison > 0){
-        racine->pDroit = InsertionAVL(racine->pDroit, Noeud, h);
-        if(*h!=0){
-            racine->equilibre++;
-        }
-    }
-    else{
+
+    // Vérification des pointeurs
+    if (Noeud == NULL || Noeud->id == NULL || racine->id == NULL) {
         *h = 0;
         return racine;
     }
+
+    int comparaison = strcmp(Noeud->id, racine->id);
+
+    if (comparaison < 0) {
+        racine->pGauche = InsertionAVL(racine->pGauche, Noeud, h);
+        if (*h != 0) {
+            racine->equilibre--;
+        }
+    }
+    else if (comparaison > 0) {
+        racine->pDroit = InsertionAVL(racine->pDroit, Noeud, h);
+        if (*h != 0) {
+            racine->equilibre++;
+        }
+    }
+    else {
+        *h = 0;
+        return racine;
+    }
+
     // Rééquilibrage
-    if (racine->equilibre == 0){
-        // La hauteur de ce sous-arbre n'a pas changé
-        *h = 0; 
+    if (racine->equilibre == 0) {
+        *h = 0;
         return racine;
     }
-    else if (racine->equilibre == -1 || racine->equilibre == 1){
-        // On change rien, la hauteur de ce sous-arbre a augmenté de 1.
-        *h = 1; 
+    else if (racine->equilibre == -1 || racine->equilibre == 1) {
+        *h = 1;
         return racine;
     }
-    else { 
-        *h = 0; 
-        
+    else {
+        *h = 0;
+
         // Déséquilibre gauche (-2)
-        if (racine->equilibre < -1) { 
+        if (racine->equilibre < -1) {
+            // Vérification de l'existence de racine->pGauche
+            if (racine->pGauche == NULL) {
+                return racine;
+            }
             if (racine->pGauche->equilibre > 0) {
-                return doubleRotationGauche_FUITES(racine); 
+                return doubleRotationGauche_FUITES(racine);
             } else {
                 return RotationDroite_FUITES(racine);
             }
-        } 
+        }
         // Déséquilibre droite (+2)
-        else { 
+        else {
+            // Vérification de l'existence de racine->pDroit
+            if (racine->pDroit == NULL) {
+                return racine;
+            }
             if (racine->pDroit->equilibre < 0) {
                 return doubleRotationDroite_FUITES(racine);
             } else {
-                return RotationGauche_FUITES(racine); 
+                return RotationGauche_FUITES(racine);
             }
         }
     }
@@ -223,7 +237,7 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, const char* id){
         return NULL;
     }
     int comparaison = strcmp(id, racine->id);
-    printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
+    //printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
     if (comparaison == 0) {
         return racine->ptr;
     } else if (comparaison < 0) {
