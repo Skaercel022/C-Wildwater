@@ -40,16 +40,16 @@ Ce projet utilise un script shell (`c-wildwater.sh`) pour compiler et exécuter 
 1.  **Histogramme :**
 
     ```bash
-    ./c-wildwater.sh <fichier_donnees> histo <max|src|real|All>
+    ./c-wildwater.sh <fichier_donnees> histo <max|src|real|all>
     ```
 
     *   `<fichier_donnees>` : Le fichier de données à utiliser pour générer l'histogramme.
     *   `histo` : Indique que vous souhaitez générer un histogramme.
-    *   `<max|src|real|All>` : Le type de données à afficher dans l'histogramme :
+    *   `<max|src|real|all>` : Le type de données à afficher dans l'histogramme :
         *   `max` : Valeurs maximales.
         *   `src` : Valeurs sources.
         *   `real` : Valeurs réelles.
-        *   `All` : L'ensemble des valeur énnoncés.
+        *   `all` : L'ensemble des valeurs énnoncées.
 
 2.  **Fuites :**
 
@@ -72,4 +72,5 @@ C-Wildwater/
 ├── codeC/                         # Répertoire contenant le code source C
 └── docs/                          # Répertoire pour la documentation supplémentaire
 ```
+
 
