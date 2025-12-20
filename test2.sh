@@ -232,7 +232,7 @@ esac
 fi
 
 if [ "$MODE" = "leaks" ]; then
-    grep -wF "$MODE" ./"$DATA_FILE" | ./codeC/run "leaks" "$TYPE"
+    grep -wF "$TYPE" ./"$DATA_FILE" | ./codeC/run "leaks" "$TYPE"
     RET=$?
 
     rm -f "$TMP_FILE"

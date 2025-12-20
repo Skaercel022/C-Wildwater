@@ -17,7 +17,7 @@ typedef struct {
 
 //liste arbre
 Liste_arbre* creerListeArbre(char* id);
-void ajouterEnfant(Arbre* arbre, char* id_enfant);
+//void ajouterEnfant(Arbre* arbre, char* id_enfant);
 void suppListeArbre(Liste_arbre* liste);
 
 //arbre

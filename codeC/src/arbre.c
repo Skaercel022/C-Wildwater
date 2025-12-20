@@ -1,5 +1,5 @@
 #include "../include/include.h"
-
+/*
 Liste_arbre* creerListeArbre(char* id){
     Liste_arbre* liste = malloc(sizeof(Liste_arbre));
     if(liste == NULL){
@@ -65,3 +65,4 @@ void suppNoeud(Arbre* arbre){
     }
 }
 
+*/
