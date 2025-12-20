@@ -199,10 +199,16 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h){
 // Fin de fonctions AVL
 
 
-Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id){
-    while (liste != NULL){
-        if (strcmp(liste->enfant->id, Id->id) == 0){
-            return liste->enfant;
+Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id) {
+    if (liste == NULL || Id == NULL || Id->id == NULL) {
+        return NULL;
+    }
+
+    while (liste != NULL) {
+        if (liste->enfant != NULL && liste->enfant->id != NULL) {
+            if (strcmp(liste->enfant->id, Id->id) == 0) {
+                return liste->enfant;
+            }
         }
         liste = liste->next;
     }
@@ -240,53 +246,58 @@ void ajouterVolumeArbre(LignesCSV* ligne, Arbre_liste* racine){
 
 
 void ajouterNoeudArbre(AVL_FUITES** racine_AVL, LignesCSV* ligne, Arbre_liste** racine_physique) {
-    if (ligne == NULL) return;
+    if (ligne == NULL || racine_AVL == NULL || racine_physique == NULL) {
+        return;
+    }
+
     int h = 0;
 
     // --- 1. GÉRER LE PARENT (AMONT) ---
     Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, ligne->id_amont);
     if (Noeud_amont == NULL) {
-        // On crée manuellement le parent car on ne l'a pas encore vu
         Noeud_amont = malloc(sizeof(Arbre_liste));
-        if(Noeud_amont == NULL){
+        if (Noeud_amont == NULL) {
             exit(666);
         }
+
         Noeud_amont->liste = NULL;
         Noeud_amont->nb_enfant = 0;
-        Noeud_amont->coefficient_fuite = 0.0; // Valeur par défaut
+        Noeud_amont->coefficient_fuite = 0.0;
         Noeud_amont->Volume_parent = 0.0;
-        
-        // On alloue l'ID avec l'AMONT
-        Noeud_amont->id = malloc(strlen(ligne->id_amont) + 1);
-        strcpy(Noeud_amont->id, ligne->id_amont);
-        
+
+        // Allouer l'ID avec l'AMONT
+        Noeud_amont->id = strdup(ligne->id_amont);
+        if (Noeud_amont->id == NULL) {
+            free(Noeud_amont);
+            exit(666);
+        }
+
         *racine_AVL = InsertionAVL(*racine_AVL, Noeud_amont, &h);
-        
+
         // Premier nœud vu = racine potentielle
-        if (*racine_physique == NULL) *racine_physique = Noeud_amont;
+        if (*racine_physique == NULL) {
+            *racine_physique = Noeud_amont;
+        }
     }
 
     // --- 2. GÉRER L'ENFANT (AVAL) ---
     Arbre_liste* Noeud_aval = rechercheArbre(*racine_AVL, ligne->id_aval);
     if (Noeud_aval == NULL) {
-        // On utilise ton constructeur habituel
-        Noeud_aval = constructeurArbre(ligne); 
+        Noeud_aval = constructeurArbre(ligne);
         h = 0;
         *racine_AVL = InsertionAVL(*racine_AVL, Noeud_aval, &h);
     }
 
     // --- 3. LIAISON ET DONNÉES ---
-    // On met à jour les données de l'enfant avec les infos de la ligne actuelle
+    // Mettre à jour les données de l'enfant avec les infos de la ligne actuelle
     Noeud_aval->coefficient_fuite = (float)ligne->fuite;
-    
+
     // IMPORTANT : On n'ajoute l'enfant que s'il n'est pas déjà dans la liste du parent
-    // pour éviter les boucles et les Segfaults de récursion
     if (rechercheliste(Noeud_amont->liste, Noeud_aval) == NULL) {
         ajouter_enfant(Noeud_amont, Noeud_aval);
     }
 
     if (ligne->Volume > 0.0) {
-        // Utilise directement l'addition au lieu de ta fonction qui met la fuite à 0
         Noeud_aval->Volume_parent += ligne->Volume;
     }
 }
@@ -363,14 +374,7 @@ void liberer_arbre_physique(Arbre_liste* noeud) {
 
 void suppression_AVL_FUITES(AVL_FUITES* racine) {
     if (racine == NULL) return;
-
-    // Parcours post-fixe pour libérer les feuilles avant les parents
     suppression_AVL_FUITES(racine->pGauche);
     suppression_AVL_FUITES(racine->pDroit);
-
-    // Note importante : 
-    // On ne fait PAS free(racine->id) ici car c'est le même pointeur que noeud->id
-    // qui a déjà été libéré par liberer_arbre_physique.
-    
     free(racine); 
 }
