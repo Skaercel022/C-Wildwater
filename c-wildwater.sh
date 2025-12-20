@@ -232,12 +232,7 @@ esac
 fi
 
 if [ "$MODE" = "leaks" ]; then
-    cut -d ';' -f2,3,4,5 "$DATA_FILE" | tr '-' '0' > "$TMP_FILE"
-    
-    if [ ! -s "$TMP_FILE" ]; then
-        erreur_sortie "L'usine avec l'ID spécifiée n'a pas été trouvée"
-    fi
-    ./codeC/run leaks "$TYPE" "$TMP_FILE"
+    grep -wF "$MODE" ./"$DATA_FILE" | ./run "leaks" "$MODE"
     RET=$?
 
     rm -f "$TMP_FILE"
