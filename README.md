@@ -66,12 +66,13 @@ Ce projet utilise un script shell (`c-wildwater.sh`) pour compiler et exécuter 
 ```
 C-Wildwater/
 ├── .gitignore                     # Spécifie les fichiers intentionnellement non suivis que Git doit ignorer
-├── Projet_C-WildWater_preIng2_2025_2026_v1.1.pdf  # Documentation du projet (probablement en français)
+├── Projet_C-WildWater_preIng2_2025_2026_v1.1.pdf  # Documentation du projet
 ├── README.md                      # Ce fichier !
 ├── c-wildwater.sh                 # Script shell pour compiler et exécuter le programme
 ├── codeC/                         # Répertoire contenant le code source C
 └── tests/                         # Répertoire pour les images et fichiers de tests
 ```
+
 
 
 
