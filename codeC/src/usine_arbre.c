@@ -1,9 +1,6 @@
 #include "../include/include.h"
 
-
-
-// Création des structures :
-
+//toutes les fonctions de construct
 Arbre_liste* constructeurArbre(char* id, double fuite){
     Arbre_liste* Arbre=malloc(sizeof(Arbre_liste));
     if(Arbre == NULL){
@@ -72,7 +69,7 @@ void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     parent->liste=nouveau;
     parent->nb_enfant+=1;
 }
-
+//lire ligne et la parser
 int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, double*  fuite, char* buffer){
     if (!id_amont || !id_aval || !volume || !fuite || !id_usine || !buffer){
         return 0;
@@ -164,7 +161,6 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine_avl, Arbre_liste* Noeud, int* h) {
         return constructeurAVL(Noeud);
     }
 
-    // Vérification des pointeurs
     if (Noeud == NULL || Noeud->id == NULL || racine_avl->id == NULL) {
         *h = 0;
         return racine_avl;
@@ -277,8 +273,8 @@ void ajouterNoeudArbre(AVL_FUITES** racine_AVL, char* id_amont, char* id_aval, d
             printf("Le parent n'existe pas Erreur\n");
             exit(205);
         }
-        *racine_AVL = InsertionAVL(*racine_AVL,nouveau,&h); // je l'ajoute dans l'AVL
-        ajouter_enfant(parent,nouveau); //je crée le lien entre les deux 
+        *racine_AVL = InsertionAVL(*racine_AVL,nouveau,&h);
+        ajouter_enfant(parent,nouveau);
         
         if(*racine_AVL == NULL){
             printf("Erreur d'insertion\n");
@@ -290,8 +286,7 @@ void ajouterNoeudArbre(AVL_FUITES** racine_AVL, char* id_amont, char* id_aval, d
 }
 
 
-// Calcule des fuites totales
-
+//Calcul des fuites totales
 double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     if (noeud == NULL || volume_entrant <= 0.0) {
         return 0.0;
@@ -299,7 +294,6 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     double fuite_locale = (noeud->coefficient_fuite / 100.0) * volume_entrant;
     double total_fuites = fuite_locale;
 
-    // Compter le nombre d'enfants
     int nb_enfant = 0;
     Liste* tmp = noeud->liste;
     while (tmp != NULL) {
@@ -310,17 +304,14 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     }
 
     if (nb_enfant == 0) {
-        return 0.0; // Pas d'enfants, pas de fuites
+        return 0.0;
     }
 
     Liste* liste = noeud->liste;
     while (liste != NULL) {
         if (liste->enfant != NULL) {
             double volume_restant = volume_entrant - fuite_locale;
-            // Calcul des fuites locales
             double volume_par_enfant = volume_restant / nb_enfant;
-            // Volume restant après fuite
-            // Appel récursif
             total_fuites +=  calculer_fuites_rec(liste->enfant, volume_par_enfant);
         }
         liste = liste->next;
@@ -332,12 +323,10 @@ double calculer_fuites(AVL_FUITES* racine_AVL, char* id_usine) {
     if (racine_AVL == NULL || id_usine == NULL) {
         exit(210);
     }
-    // Rechercher le noeud de l'usine
     Arbre_liste* noeud_usine = rechercheArbre(racine_AVL, id_usine);
     if (noeud_usine == NULL) {
         exit(210);
     }
-    // Calculer les fuites totales
     return calculer_fuites_rec(noeud_usine, noeud_usine->Volume_parent);
 }
 
@@ -350,14 +339,14 @@ void liberer_arbre_physique(Arbre_liste* noeud) {
         liberer_arbre_physique(actuel->enfant);
         
         actuel = actuel->next;
-        free(a_supprimer); // Libère le maillon de la liste
+        free(a_supprimer);
     }
 
     if (noeud->id != NULL) {
-        free(noeud->id); // Libère la chaîne de caractères allouée par strdup/malloc
+        free(noeud->id);
     }
     
-    free(noeud); // Libère la structure Arbre_liste
+    free(noeud);
 }
 
 void suppression_AVL_FUITES(AVL_FUITES* racine) {

@@ -24,7 +24,6 @@ int estVide(char *s) {
 //fonction utilitaire permettant de lire une ligne complète d'un fichier peu importe sa longueur
 
 char* lireLigne(FILE* fichier) {
-    //taille initiale du buffer (augmentera automatiquement si nécessaire)
     unsigned int capacite = 256;
     char* buffer = malloc(capacite);
     if (buffer == NULL) {
@@ -33,7 +32,7 @@ char* lireLigne(FILE* fichier) {
 
     unsigned int position = 0;
     int c;
-    //lecture caractère par caractère jusqu'à la fin de la ligne ou du fichier : si buffer plein, on réalloue le double
+    //lecture caractère par caractère jusqu'à la fin de la ligne ou du fichier : si buffer plein on realloue le double
     while ((c = fgetc(fichier)) != EOF) {
         if (position >= capacite - 1) {
             capacite *= 2;
@@ -49,7 +48,7 @@ char* lireLigne(FILE* fichier) {
 
         buffer[position++] = c;
     }
-    //si on arrive à EOF sans avoir lu un seul caractère
+    //si on arrive a eof sans avoir lu un seul caractere
     if (position == 0 && c == EOF) {
         free(buffer);
         return NULL;
