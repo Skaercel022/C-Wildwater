@@ -172,7 +172,7 @@ int partitionUsines(AVL_USINE** tab, int bas, int haut) {
     echangerUsines(&tab[i + 1], &tab[haut]);
     return i + 1;
 }
-
+//tri rapide decroissant alphabetique
 void triRapideUsinesDec(AVL_USINE** tab, int bas, int haut) {
     if (bas < haut) {
         int pivot = partitionUsines(tab, bas, haut);
@@ -227,10 +227,8 @@ void fichier50PlusPetitesMax(AVL_USINE* racine, char* nomFichierSortie) {
     AVL_USINE* tableauUsines[50];
     int compteur = 0;
 
-    // sélection basée sur volume max/capte/traite
     parcoursInfixeInsertionPetitesMax(racine, tableauUsines, &compteur);
 
-    // tri alphabetique décroissant
     triRapideUsinesDec(tableauUsines, 0, compteur - 1);
 
     fprintf(fichierSortie, "ID_Usine;Volume_Max;Volume_Capte;Volume_Traite\n");
