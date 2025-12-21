@@ -70,7 +70,8 @@ C-Wildwater/
 ├── README.md                      # Ce fichier !
 ├── c-wildwater.sh                 # Script shell pour compiler et exécuter le programme
 ├── codeC/                         # Répertoire contenant le code source C
-└── docs/                          # Répertoire pour la documentation supplémentaire
+└── tests/                         # Répertoire pour les images et fichiers de tests
 ```
+
 
 
