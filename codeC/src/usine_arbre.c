@@ -79,17 +79,23 @@ int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, 
     }
     char volbuffer[256];
     char futbuffer[256];
-    sscanf(buffer, "%255[^;];%255[^;];%255[^;];%255[^;];%255[^;]", id_usine, id_amont, id_aval, volbuffer, futbuffer);
+    int nb = sscanf(buffer, "%255[^;];%255[^;];%255[^;];%255[^;];%255[^;]", id_usine, id_amont, id_aval, volbuffer, futbuffer);
+    if(nb != 5){
+        return 0;
+    }
+    
     *volume = atof(volbuffer);
     *fuite = atof(futbuffer);
     return 1;
 }
 
 AVL_FUITES* RotationGauche_FUITES(AVL_FUITES* racine) {
-    if (!racine) return racine;
+    if (racine == NULL || racine->pDroit == NULL){
+        return racine;
+    } 
 
     AVL_FUITES* pivot = racine->pDroit;
-    racine->pGauche = pivot->pGauche;
+    racine->pDroit = pivot->pGauche;
     pivot->pGauche = racine;
 
     int eq_racine = racine->equilibre;
@@ -104,8 +110,12 @@ AVL_FUITES* RotationGauche_FUITES(AVL_FUITES* racine) {
 
 AVL_FUITES* RotationDroite_FUITES(AVL_FUITES* racine){
     //rotation
+    if(racine == NULL || racine->pGauche == NULL){
+        return racine;
+    }
     AVL_FUITES* pivot = racine->pGauche;
     racine->pGauche = pivot->pDroit;
+    pivot->pDroit = racine;
 
     int eq_racine = racine->equilibre;
     int eq_pivot = pivot->equilibre;
@@ -127,8 +137,9 @@ AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine){
 }
 
 AVL_FUITES* equilibrerAVL(AVL_FUITES* racine){
+    if(!racine) return racine;
     if(racine->equilibre >= 2){
-        if (racine->pDroit->equilibre >= 0){
+        if (racine->pDroit && racine->pDroit->equilibre >= 0){
             return RotationGauche_FUITES(racine);
         }
         else{
@@ -136,7 +147,7 @@ AVL_FUITES* equilibrerAVL(AVL_FUITES* racine){
         }
     }
     else if(racine->equilibre <= -2){
-        if(racine->pGauche->equilibre <= 0){
+        if(racine->pGauche && racine->pGauche->equilibre <= 0){
             return RotationDroite_FUITES(racine);
         }
         else{
@@ -212,12 +223,16 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
         printf("Debug id null\n");
         return NULL;
     }
-    if (racine->id == NULL) {
+    if (racine->id == NULL ) {
         printf("Debug racine->id null\n");
         return NULL;
     }
+
+    if(strcmp(racine->id,"-") == 0){
+        printf("Des tirets dans les noeud\n");
+    }
     int comparaison = strcmp(id, racine->id);
-    //printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
+    printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
     if (comparaison == 0) {
         return racine->ptr;
     } else if (comparaison < 0) {
@@ -237,49 +252,43 @@ void ajouterVolumeArbre(double fuite, double Volume, Arbre_liste* racine){
 
 
 
-void ajouterNoeudArbre(AVL_FUITES** racine_AVL, Arbre_liste** racine_physique, char* id_amont, char* id_aval, double volume, double fuite) {
-    if (racine_AVL == NULL || racine_physique == NULL) {
-        printf("Erreur : racine_AVL ou racine_physique NULL dans ajouterNoeudArbre\n");
-        exit(200);
-        return;
+void ajouterNoeudArbre(AVL_FUITES** racine_AVL, char* id_amont, char* id_aval, double volume, double fuite) {
+    int h=0;
+    if(id_amont == NULL){
+        exit(205);
     }
-
-    int h = 0;
-
-    // --- 1. GÉRER LE PARENT (AMONT) ---
-    Arbre_liste* Noeud_amont = rechercheArbre(*racine_AVL, id_amont);
-    if (Noeud_amont == NULL) {
-        Noeud_amont = constructeurArbre(id_amont, 0.0);
-        *racine_AVL = InsertionAVL(*racine_AVL, Noeud_amont, &h);
-        if (*racine_physique == NULL) {
-            *racine_physique = Noeud_amont;
+    double volume_vers_usine =0.0;
+    //gestion d'une source : 
+    if(volume>0.0 && fuite != 0.0){
+        volume_vers_usine += volume * (fuite /100.0);
+        Arbre_liste* nouveau = constructeurArbre(id_aval,volume_vers_usine);
+        nouveau->Volume_parent += volume_vers_usine;
+        *racine_AVL = InsertionAVL(*racine_AVL,nouveau,&h);
+        if(*racine_AVL == NULL){
+            printf("Erreur d'insertion\n");
+            exit(220);
         }
     }
-    if (strcmp(id_amont, id_aval) == 0) {
-        printf("Erreur : id_amont et id_aval identiques (%s), boucle non autorisée.\n", id_amont);
-    return;
-    }
-    // --- 2. GÉRER L'ENFANT (AVAL) ---
-    Arbre_liste* Noeud_aval = rechercheArbre(*racine_AVL, id_aval);
-    if (Noeud_aval == NULL) {
-        Noeud_aval = constructeurArbre(id_aval,fuite);
-        h = 0;
-        *racine_AVL = InsertionAVL(*racine_AVL, Noeud_aval, &h);
-    }
+
     else{
-        Noeud_aval->coefficient_fuite = fuite;
-    }
+        Arbre_liste* nouveau = constructeurArbre(id_aval,volume_vers_usine);
+        Arbre_liste* parent = rechercheArbre(*racine_AVL,id_amont);
+        if(parent == NULL){
+            printf("Le parent n'existe pas Erreur\n");
+            exit(205);
+        }
+        *racine_AVL = InsertionAVL(*racine_AVL,nouveau,&h); // je l'ajoute dans l'AVL
+        ajouter_enfant(parent,nouveau); //je crée le lien entre les deux 
+        
+        if(*racine_AVL == NULL){
+            printf("Erreur d'insertion\n");
+            exit(220);
+        }
 
-   
-    // IMPORTANT : On n'ajoute l'enfant que s'il n'est pas déjà dans la liste du parent
-    if (rechercheliste(Noeud_amont->liste, Noeud_aval) == NULL) {
-        ajouter_enfant(Noeud_amont, Noeud_aval);
-    }
-
-    if (volume > 0.0) {
-        Noeud_aval->Volume_parent += volume;
+        
     }
 }
+
 
 // Calcule des fuites totales
 

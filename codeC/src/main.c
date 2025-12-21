@@ -50,10 +50,11 @@ int main(int argc, char** argv) {
         while(fgets(buffer,sizeof(buffer), stdin)){
         // Construction
             if (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite, buffer)) {
-                ajouterNoeudArbre(&index_avl, &arbre, id_amont, id_aval, volume, fuite);
+                ajouterNoeudArbre(&index_avl,id_amont, id_aval, volume, fuite);
                 printf("Ajout noeud arbre réussi\n");
-            }
+            }   
         }
+        printf("je sors du while\n");
         Arbre_liste* noeud_depart = rechercheArbre(index_avl, id_recherche);
         printf("ID noeuds depart %s\n", noeud_depart->id);
         if (noeud_depart == NULL) {

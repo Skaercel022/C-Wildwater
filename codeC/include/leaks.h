@@ -39,7 +39,7 @@ Arbre_liste* constructeurArbre(char* id, double fuite);
 Liste* constructeurListe(Arbre_liste* enfant);
 void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant);
 void ajouterVolumeArbre(double fuite, double Volume, Arbre_liste* racine);
-void ajouterNoeudArbre(AVL_FUITES** racine_AVL, Arbre_liste** racine_physique, char* id_amont, char* id_aval, double volume, double fuite);
+void ajouterNoeudArbre(AVL_FUITES** racine_AVL, char* id_amont, char* id_aval, double volume, double fuite);
 
 // Gestion de l'Index AVL
 AVL_FUITES* constructeurAVL(Arbre_liste* Noeud);
