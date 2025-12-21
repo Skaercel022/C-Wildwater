@@ -1,4 +1,4 @@
-#include "include.h"
+#include "../include/include.h"
 
 
 int main(int argc, char** argv) {
@@ -51,6 +51,7 @@ int main(int argc, char** argv) {
         // Construction
             if (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite, buffer)) {
                 ajouterNoeudArbre(&index_avl, &arbre, id_amont, id_aval, volume, fuite);
+                printf("Ajout noeud arbre réussi\n");
             }
         }
         Arbre_liste* noeud_depart = rechercheArbre(index_avl, id_recherche);

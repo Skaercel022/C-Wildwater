@@ -6,6 +6,10 @@
 
 Arbre_liste* constructeurArbre(char* id, double fuite){
     Arbre_liste* Arbre=malloc(sizeof(Arbre_liste));
+    if(Arbre == NULL){
+        printf("Erreur allocation memoire constructeurArbre\n");
+        exit(200);
+    }
     Arbre->liste=NULL;
     Arbre->nb_enfant=0;
     Arbre->coefficient_fuite= fuite;
@@ -20,15 +24,28 @@ Arbre_liste* constructeurArbre(char* id, double fuite){
 }
 
 Liste* constructeurListe(Arbre_liste* enfant){
+    if(enfant == NULL){
+        printf("Erreur : enfant NULL dans constructeurListe\n");
+        exit(250);
+    }
     Liste* nouveau=malloc(sizeof(Liste));
+    if(nouveau == NULL){
+        printf("Erreur allocation memoire constructeurListe\n");
+        exit(250);
+    }
     nouveau->next=NULL;
     nouveau->enfant=enfant;
     return nouveau;
 }
 
 AVL_FUITES* constructeurAVL(Arbre_liste* Noeud){
+    if(!Noeud){
+        printf("Racine de base nulle dans constructeurAVL\n");
+        exit(250);
+    }
     AVL_FUITES* nouveau = malloc(sizeof(AVL_FUITES));
-    if (nouveau == NULL){
+    if (nouveau == NULL) {
+        printf("Erreur allocation memoire constructeurAVL\n");
         exit(1);
     }
     nouveau->id = strdup(Noeud->id);
@@ -38,17 +55,19 @@ AVL_FUITES* constructeurAVL(Arbre_liste* Noeud){
     nouveau->ptr = Noeud;
     return nouveau;
 }
-// Fin création des structures
 
 void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     if (parent == NULL || enfant == NULL) {
+        printf("Erreur : parent ou enfant NULL dans ajouter_enfant\n");
         exit(200);
     }
     Liste* nouveau=constructeurListe(enfant);
     if (nouveau == NULL){
-      exit(200);
+        printf("Erreur allocation memoire ajouter_enfant\n");
+        exit(200);
     }
     // Empiler :
+    printf("Ajout de l'enfant %s au parent %s\n", enfant->id, parent->id);
     nouveau->next=parent->liste;
     parent->liste=nouveau;
     parent->nb_enfant+=1;
@@ -58,34 +77,11 @@ int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, 
     if (!id_amont || !id_aval || !volume || !fuite || !id_usine || !buffer){
         return 0;
     }
-       char* token = strtok(buffer, ";");
-        id_usine = strdup(token);
-        token = strtok(NULL,";");
-
-        id_amont = strdup(token);
-        token = strtok(NULL,";");
-
-        id_aval = strdup(token);
-        token = strtok(NULL,";");
-
-        *volume = atof(token);
-        token = strtok(NULL,";");
-
-        *fuite = atof(token);
-    
-        /*
-        char* col1 = strtok(buffer, ";");
-        char* col2 = strtok(NULL, ";");
-        char* col3 = strtok(NULL, ";");
-        char* col4 = strtok(NULL, ";");
-        char* col5 = strtok(NULL, ";");
-
-        id_usine = strdup(col1);
-        id_amont = strdup(col2);
-        id_aval = strdup(col3);
-        *volume = atof(col4);
-        *fuite = atof(col5);
-        */
+    char volbuffer[256];
+    char futbuffer[256];
+    sscanf(buffer, "%255[^;];%255[^;];%255[^;];%255[^;];%255[^;]", id_usine, id_amont, id_aval, volbuffer, futbuffer);
+    *volume = atof(volbuffer);
+    *fuite = atof(futbuffer);
     return 1;
 }
 
@@ -189,36 +185,31 @@ AVL_FUITES* InsertionAVL(AVL_FUITES* racine_avl, Arbre_liste* Noeud, int* h) {
     return racine_avl;
 }
 
-// Fin de fonctions AVL
 
 
-Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id) {
-    if (liste == NULL || Id == NULL || Id->id == NULL) {
+Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* arbre) {
+    if (liste == NULL || arbre == NULL || arbre->id == NULL) {
         return NULL;
     }
-
-    int securite = 0; // Compteur de sécurité
-    
-    while (liste != NULL) {
-        // PROTECTION ANTI-BOUCLE INFINIE
-        if (securite++ > 10000) { 
-            fprintf(stderr, "ERREUR CRITIQUE : Cycle détecté dans la liste des enfants de %s !\n", Id->id);
-            exit(505); // On arrête tout pour que tu voies l'erreur
-        }
-
-        if (liste->enfant != NULL && liste->enfant->id != NULL) {
-            if (strcmp(liste->enfant->id, Id->id) == 0) {
-                return liste->enfant;
+    Liste* p1 = liste;
+    while (p1 != NULL) {
+        if (p1->enfant != NULL && p1->enfant->id != NULL) {
+            if (strcmp(p1->enfant->id, arbre->id) == 0) {
+                return p1->enfant;
             }
         }
-        liste = liste->next;
+        p1 = p1->next;
     }
     return NULL;
 }
 
 Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
-    if (racine == NULL || id == NULL){
-        printf("Debug racine ou id null\n");
+    if (racine == NULL){
+        printf("Debug racine null\n");
+        return NULL;
+    }
+    if( id == NULL) {
+        printf("Debug id null\n");
         return NULL;
     }
     if (racine->id == NULL) {
@@ -248,6 +239,8 @@ void ajouterVolumeArbre(double fuite, double Volume, Arbre_liste* racine){
 
 void ajouterNoeudArbre(AVL_FUITES** racine_AVL, Arbre_liste** racine_physique, char* id_amont, char* id_aval, double volume, double fuite) {
     if (racine_AVL == NULL || racine_physique == NULL) {
+        printf("Erreur : racine_AVL ou racine_physique NULL dans ajouterNoeudArbre\n");
+        exit(200);
         return;
     }
 
@@ -263,6 +256,7 @@ void ajouterNoeudArbre(AVL_FUITES** racine_AVL, Arbre_liste** racine_physique, c
         }
     }
     if (strcmp(id_amont, id_aval) == 0) {
+        printf("Erreur : id_amont et id_aval identiques (%s), boucle non autorisée.\n", id_amont);
     return;
     }
     // --- 2. GÉRER L'ENFANT (AVAL) ---
