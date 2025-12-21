@@ -54,12 +54,10 @@ void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     parent->nb_enfant+=1;
 }
 
-int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, double*  fuite){
-    if (!id_amont || !id_aval || !volume || !fuite || !id_usine){
+int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, double*  fuite, char* buffer){
+    if (!id_amont || !id_aval || !volume || !fuite || !id_usine || !buffer){
         return 0;
     }
-    char buffer[1024];
-    while(fgets(buffer,sizeof(buffer),stdin)){
         char* token = strtok(buffer, ";");
         id_usine = strdup(token);
         token = strtok(NULL,";");
@@ -74,7 +72,7 @@ int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, 
         token = strtok(NULL,";");
 
         *fuite = atof(token);
-    }
+    
 
     return 1;
 }

@@ -32,7 +32,7 @@ typedef struct avl_fuites{
 
 
 // --- Gestion des lignes CSV ---
-int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* Volume, double*  fuite);
+int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* Volume, double*  fuite, char* buffer);
 
 //  Gestion de l'Arbre Physique 
 Arbre_liste* constructeurArbre(char* id, double fuite);

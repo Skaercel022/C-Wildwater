@@ -43,12 +43,15 @@ int main(int argc, char** argv) {
         char id_usine[256];
         char id_amont[256];
         char id_aval[256];
+        char buffer[1024];
         double volume;
         double fuite;  
 
+        while(fgets(buffer,sizeof(buffer), stdin)){
         // Construction
-        while (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite)) {
-            ajouterNoeudArbre(&index_avl, &racine_physique, id_amont, id_aval, volume, fuite);
+            if (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite, buffer)) {
+                ajouterNoeudArbre(&index_avl, &racine_physique, id_amont, id_aval, volume, fuite);
+            }
         }
         Arbre_liste* noeud_depart= rechercheArbre(index_avl, id_recherche);
         if (noeud_depart == NULL) {
