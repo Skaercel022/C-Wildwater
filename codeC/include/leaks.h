@@ -61,5 +61,6 @@ AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine);
 // Libération mémoire
 void liberer_arbre_physique(Arbre_liste* noeud);
 void suppression_AVL_FUITES(AVL_FUITES* racine);
+int ecriture_fichier(char* id, double volume);
 
 #endif // LEAKS_H
