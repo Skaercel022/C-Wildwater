@@ -45,15 +45,11 @@ int main(int argc, char** argv) {
         double fuite;  
 
         while(fgets(buffer,sizeof(buffer), stdin)){
-        // Construction
             if (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite, buffer)) {
                 ajouterNoeudArbre(&index_avl,id_amont, id_aval, volume, fuite);
-                //printf("Ajout noeud arbre réussi\n");
             }   
         }
-        //printf("je sors du while\n");
         Arbre_liste* noeud_depart = rechercheArbre(index_avl, id_usine);
-        //printf("ID noeuds depart %s\n", noeud_depart->id);
         if (noeud_depart == NULL) {
             printf("%s;-1\n", id_recherche);
         } else {

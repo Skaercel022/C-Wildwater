@@ -55,16 +55,12 @@ AVL_FUITES* constructeurAVL(Arbre_liste* Noeud){
 
 void ajouter_enfant(Arbre_liste* parent, Arbre_liste* enfant){
     if (parent == NULL || enfant == NULL) {
-        //printf("Erreur : parent ou enfant NULL dans ajouter_enfant\n");
         exit(200);
     }
     Liste* nouveau=constructeurListe(enfant);
     if (nouveau == NULL){
-        //printf("Erreur allocation memoire ajouter_enfant\n");
         exit(200);
     }
-    // Empiler :
-    //printf("Ajout de l'enfant %s au parent %s\n", enfant->id, parent->id);
     nouveau->next=parent->liste;
     parent->liste=nouveau;
     parent->nb_enfant+=1;
@@ -216,15 +212,12 @@ Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
         return NULL;
     }
     if( id == NULL) {
-        //printf("Debug id null\n");
         return NULL;
     }
     if (racine->id == NULL ) {
-        //printf("Debug racine->id null\n");
         return NULL;
     }
     int comparaison = strcmp(id, racine->id);
-    //printf("Compare [%s] (len %d) avec [%s] (len %d)\n", id, (int)strlen(id), racine->id, (int)strlen(racine->id));
     if (comparaison == 0) {
         return racine->ptr;
     } else if (comparaison < 0) {
@@ -257,7 +250,6 @@ void ajouterNoeudArbre(AVL_FUITES** racine_AVL, char* id_amont, char* id_aval, d
         nouveau->Volume_parent += volume_vers_usine;
         *racine_AVL = InsertionAVL(*racine_AVL,nouveau,&h);
         if(*racine_AVL == NULL){
-            //printf("Erreur d'insertion\n");
             exit(220);
         }
     }
@@ -266,14 +258,12 @@ void ajouterNoeudArbre(AVL_FUITES** racine_AVL, char* id_amont, char* id_aval, d
         Arbre_liste* nouveau = constructeurArbre(id_aval,volume_vers_usine);
         Arbre_liste* parent = rechercheArbre(*racine_AVL,id_amont);
         if(parent == NULL){
-            //printf("Le parent n'existe pas Erreur\n");
             exit(205);
         }
         *racine_AVL = InsertionAVL(*racine_AVL,nouveau,&h);
         ajouter_enfant(parent,nouveau);
         
         if(*racine_AVL == NULL){
-            //printf("Erreur d'insertion\n");
             exit(220);
         }
 
