@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
 
 
         AVL_FUITES* index_avl = NULL;
-        Arbre_liste* racine_physique = NULL;
+        Arbre_liste* arbre = NULL;
         char id_usine[256];
         char id_amont[256];
         char id_aval[256];
@@ -50,10 +50,11 @@ int main(int argc, char** argv) {
         while(fgets(buffer,sizeof(buffer), stdin)){
         // Construction
             if (LireetParser(id_usine, id_amont, id_aval, &volume, &fuite, buffer)) {
-                ajouterNoeudArbre(&index_avl, &racine_physique, id_amont, id_aval, volume, fuite);
+                ajouterNoeudArbre(&index_avl, &arbre, id_amont, id_aval, volume, fuite);
             }
         }
-        Arbre_liste* noeud_depart= rechercheArbre(index_avl, id_recherche);
+        Arbre_liste* noeud_depart = rechercheArbre(index_avl, id_recherche);
+        printf("ID noeuds depart %s\n", noeud_depart->id);
         if (noeud_depart == NULL) {
             printf("%s;-1\n", id_recherche);
         } else {
@@ -62,7 +63,7 @@ int main(int argc, char** argv) {
             printf("%s;%.3f\n", id_recherche, pertes / 1000.0);
         }
 
-        liberer_arbre_physique(racine_physique);
+        liberer_arbre_physique(arbre);
         suppression_AVL_FUITES(index_avl);
     }
     

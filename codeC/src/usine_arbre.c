@@ -58,7 +58,7 @@ int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, 
     if (!id_amont || !id_aval || !volume || !fuite || !id_usine || !buffer){
         return 0;
     }
-        char* token = strtok(buffer, ";");
+       char* token = strtok(buffer, ";");
         id_usine = strdup(token);
         token = strtok(NULL,";");
 
@@ -73,38 +73,52 @@ int LireetParser(char* id_usine, char* id_amont, char* id_aval, double* volume, 
 
         *fuite = atof(token);
     
+        /*
+        char* col1 = strtok(buffer, ";");
+        char* col2 = strtok(NULL, ";");
+        char* col3 = strtok(NULL, ";");
+        char* col4 = strtok(NULL, ";");
+        char* col5 = strtok(NULL, ";");
 
+        id_usine = strdup(col1);
+        id_amont = strdup(col2);
+        id_aval = strdup(col3);
+        *volume = atof(col4);
+        *fuite = atof(col5);
+        */
     return 1;
 }
 
-// Fonctions pour l'AVL
-AVL_FUITES* RotationDroite_FUITES(AVL_FUITES* racine) {
-    if (!racine || !racine->pGauche) return racine;
-
-    AVL_FUITES* nouvelle_racine = racine->pGauche;
-    racine->pGauche = nouvelle_racine->pDroit;
-    nouvelle_racine->pDroit = racine;
-
-    // Mise à jour des facteurs d'équilibre
-    racine->equilibre = racine->equilibre - 1 - max(nouvelle_racine->equilibre, 0);
-    nouvelle_racine->equilibre = nouvelle_racine->equilibre - 1 + min(racine->equilibre, 0);
-
-    return nouvelle_racine;
-}
-
 AVL_FUITES* RotationGauche_FUITES(AVL_FUITES* racine) {
-    if (!racine || !racine->pDroit) return racine;
+    if (!racine) return racine;
 
-    AVL_FUITES* nouvelle_racine = racine->pDroit;
-    racine->pDroit = nouvelle_racine->pGauche;
-    nouvelle_racine->pGauche = racine;
+    AVL_FUITES* pivot = racine->pDroit;
+    racine->pGauche = pivot->pGauche;
+    pivot->pGauche = racine;
 
-    // Mise à jour des facteurs d'équilibre
-    racine->equilibre = racine->equilibre + 1 - min(nouvelle_racine->equilibre, 0);
-    nouvelle_racine->equilibre = nouvelle_racine->equilibre + 1 + max(racine->equilibre, 0);
+    int eq_racine = racine->equilibre;
+    int eq_p = pivot->equilibre;
 
-    return nouvelle_racine;
+    racine->equilibre = eq_racine - max(eq_p, 0) - 1;
+    pivot->equilibre = min(min(eq_racine - 2, eq_racine + eq_p - 2), eq_p - 1);
+
+    racine = pivot;
+    return racine;
 }
+
+AVL_FUITES* RotationDroite_FUITES(AVL_FUITES* racine){
+    //rotation
+    AVL_FUITES* pivot = racine->pGauche;
+    racine->pGauche = pivot->pDroit;
+
+    int eq_racine = racine->equilibre;
+    int eq_pivot = pivot->equilibre;
+
+    racine->equilibre = eq_racine - min(eq_pivot, 0) + 1;
+    pivot->equilibre = max(max(eq_racine + 2, eq_racine + eq_pivot + 2), eq_pivot + 1);
+    racine = pivot;
+    return racine;
+}    
 
 AVL_FUITES* doubleRotationGauche_FUITES(AVL_FUITES* racine){
     racine->pGauche = RotationDroite_FUITES(racine->pGauche);
@@ -116,75 +130,63 @@ AVL_FUITES* doubleRotationDroite_FUITES(AVL_FUITES* racine){
     return RotationDroite_FUITES(racine);
 }
 
+AVL_FUITES* equilibrerAVL(AVL_FUITES* racine){
+    if(racine->equilibre >= 2){
+        if (racine->pDroit->equilibre >= 0){
+            return RotationGauche_FUITES(racine);
+        }
+        else{
+            return doubleRotationGauche_FUITES(racine);
+        }
+    }
+    else if(racine->equilibre <= -2){
+        if(racine->pGauche->equilibre <= 0){
+            return RotationDroite_FUITES(racine);
+        }
+        else{
+            return doubleRotationDroite_FUITES(racine);
+        }
+    }
+    return racine;
+}
 
-AVL_FUITES* InsertionAVL(AVL_FUITES* racine, Arbre_liste* Noeud, int* h) {
-    if (racine == NULL) {
+
+AVL_FUITES* InsertionAVL(AVL_FUITES* racine_avl, Arbre_liste* Noeud, int* h) {
+    if (racine_avl == NULL) {
         *h = 1;
         return constructeurAVL(Noeud);
     }
 
     // Vérification des pointeurs
-    if (Noeud == NULL || Noeud->id == NULL || racine->id == NULL) {
+    if (Noeud == NULL || Noeud->id == NULL || racine_avl->id == NULL) {
         *h = 0;
-        return racine;
+        return racine_avl;
     }
 
-    int comparaison = strcmp(Noeud->id, racine->id);
+    int comparaison = strcmp(Noeud->id, racine_avl->id);
 
     if (comparaison < 0) {
-        racine->pGauche = InsertionAVL(racine->pGauche, Noeud, h);
-        if (*h != 0) {
-            racine->equilibre--;
-        }
+        racine_avl->pGauche = InsertionAVL(racine_avl->pGauche, Noeud, h);
+        *h = - *h;
     }
     else if (comparaison > 0) {
-        racine->pDroit = InsertionAVL(racine->pDroit, Noeud, h);
-        if (*h != 0) {
-            racine->equilibre++;
-        }
+        racine_avl->pDroit = InsertionAVL(racine_avl->pDroit, Noeud, h);
     }
     else {
         *h = 0;
-        return racine;
+        return racine_avl;
     }
-
-    // Rééquilibrage
-    if (racine->equilibre == 0) {
-        *h = 0;
-        return racine;
-    }
-    else if (racine->equilibre == -1 || racine->equilibre == 1) {
-        *h = 1;
-        return racine;
-    }
-    else {
-        *h = 0;
-
-        // Déséquilibre gauche (-2)
-        if (racine->equilibre < -1) {
-            // Vérification de l'existence de racine->pGauche
-            if (racine->pGauche == NULL) {
-                return racine;
-            }
-            if (racine->pGauche->equilibre > 0) {
-                return doubleRotationGauche_FUITES(racine);
-            } else {
-                return RotationDroite_FUITES(racine);
-            }
+    if (*h != 0){
+        racine_avl->equilibre += *h;
+        racine_avl = equilibrerAVL(racine_avl);
+        if(racine_avl->equilibre == 0){
+            *h = 0;
         }
-        // Déséquilibre droite (+2)
-        else {
-            // Vérification de l'existence de racine->pDroit
-            if (racine->pDroit == NULL) {
-                return racine;
-            }
-            if (racine->pDroit->equilibre < 0) {
-                return doubleRotationDroite_FUITES(racine);
-            } else {
-                return RotationGauche_FUITES(racine);
-            }
+        else{
+            *h = 1;
         }
     }
+    return racine_avl;
 }
 
 // Fin de fonctions AVL
@@ -216,9 +218,11 @@ Arbre_liste* rechercheliste(Liste* liste, Arbre_liste* Id) {
 
 Arbre_liste* rechercheArbre(AVL_FUITES* racine, char* id){
     if (racine == NULL || id == NULL){
+        printf("Debug racine ou id null\n");
         return NULL;
     }
     if (racine->id == NULL) {
+        printf("Debug racine->id null\n");
         return NULL;
     }
     int comparaison = strcmp(id, racine->id);
