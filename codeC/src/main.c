@@ -64,13 +64,10 @@ int main(int argc, char** argv) {
         }
         suppression_AVL_FUITES(index_avl);
         
-    }
-    
+    }   
     else{
         exit(99);
     }
-
-
     return 0;
 
 }

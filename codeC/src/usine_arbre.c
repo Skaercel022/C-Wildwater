@@ -290,7 +290,7 @@ double calculer_fuites_rec(Arbre_liste* noeud, double volume_entrant) {
     }
 
     if (nb_enfant == 0) {
-        return total_fuites; // Pas d'enfants, pas de fuites
+        return total_fuites;
     }
 
     Liste* liste = noeud->liste;
@@ -317,7 +317,6 @@ double calculer_fuites(AVL_FUITES* racine_AVL, char* id_usine) {
     if(noeud_usine->Volume_parent<=0.0){
         return 0.0;
     }
-    // Calculer les fuites totales
     return calculer_fuites_rec(noeud_usine, noeud_usine->Volume_parent);
 }
 
